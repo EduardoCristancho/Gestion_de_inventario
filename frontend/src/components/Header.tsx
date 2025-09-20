@@ -1,10 +1,12 @@
 "use client";
 
-import { Coffee, Settings } from "lucide-react";
+import { Coffee, LogOut, Settings } from "lucide-react";
 import ThemeSwitcher from "./ThemeSwitcher";
 import Link from "next/link";
-
+import { AuthContext } from "@/hooks/authContext";
+import { useContext } from "react";
 export default function Header() {
+  const auth = useContext(AuthContext)
   return (
     <header className="fixed top-0 left-0 z-50 w-full h-14 bg-primary border-b border-gray-200 shadow-sm flex items-center px-4">
       <div className="flex items-center justify-between w-full max-w-lg mx-auto">
@@ -26,6 +28,12 @@ export default function Header() {
               <Settings className="h-5 w-5 " />
             </button>
           </Link>
+          <div className="text-globalone">
+            <span>
+              {auth?.user?.username}
+            </span>
+            <LogOut onClick={() => auth?.logout(auth?.setUser)} className="h-5 w-5 cursor-pointer" />
+          </div>
         </div>
       </div>
     </header>

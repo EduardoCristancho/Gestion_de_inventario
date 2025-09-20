@@ -1,12 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  output   = "../node_modules/@prisma/xxx-client"
 }
 
 datasource db {
@@ -14,221 +8,214 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Empresa {
-  id_empresa               Int       @id @default(autoincrement())
-  id_estado                Int // foreign key
-  logo_empresa             String?
-  nombre                   String
-  rif                      String?   @unique 
-  correo                   String?   @unique
-  direccion                String?
-  telefono                 String?
-
-  estado                   Estado    @relation(fields: [id_estado], references: [id_estado])
-  clientes                 Clientes[]
-  almacenes                Almacen[]
-  proveedores              Proveedor[]
-  productos                Producto[] 
-  user                     User[] 
+model Company {
+  company_id   Int         @id @default(autoincrement())
+  visibility   Boolean     @default(true)
+  company_logo String?
+  name         String
+  tax_id       String?     @unique
+  email        String?     @unique
+  address      String?
+  phone        String?
+  customers    Customer[]
+  products     Product[]
+  suppliers    Supplier[]
+  users        User[]
+  warehouses   Warehouse[]
 }
 
-model Almacen {
-  id_almacen               Int       @id @default(autoincrement())
-  id_empresa               Int // foreign key
-  nombre                   String
-  correo                   String?
-  direccion                String?
-  telefono                 String?
-
-  empresa                  Empresa   @relation(fields: [id_empresa], references: [id_empresa]) 
-  usuarios                 User[]
-  stock                    Stock[]
+model Warehouse {
+  warehouse_id Int           @id @default(autoincrement())
+  company_id   Int
+  name         String
+  email        String?
+  address      String?
+  phone        String?
+  visibility   Boolean       @default(true)
+  productlist  ProductList[]
+  stock        Stock[]
+  users        User[]
+  company      Company       @relation(fields: [company_id], references: [company_id], onDelete: Cascade)
 }
 
 model User {
-  id_user                  Int       @id @default(autoincrement())
-  id_empresa               Int // foreign key
-  id_rol                   Int // foreign key
-  id_almacen               Int // foreign key
-  id_estado                Int // foreign key
-  username                 String    @unique
-  password                 String
-  foto_user                String?
-
-  empresa                  Empresa   @relation(fields: [id_empresa], references: [id_empresa])
-  rol                      Rol       @relation(fields: [id_rol], references: [id_rol]) 
-  almacen                  Almacen   @relation(fields: [id_almacen], references: [id_almacen]) 
-  estado                   Estado    @relation(fields: [id_estado], references: [id_estado]) 
-  revoked_tokens           Revoked_tokens[]
-  ventas                   Ventas[]
+  user_id        Int            @id @default(autoincrement())
+  company_id     Int
+  role_id        Int
+  warehouse_id   Int
+  visibility     Boolean        @default(true)
+  username       String         @unique
+  password       String
+  user_photo     String?
+  revoked_tokens RevokedToken[]
+  sales          Sale[]
+  company        Company        @relation(fields: [company_id], references: [company_id], onDelete: Cascade)
+  role           Role           @relation(fields: [role_id], references: [role_id], onDelete: SetNull)
+  warehouse      Warehouse      @relation(fields: [warehouse_id], references: [warehouse_id], onDelete: SetNull)
 }
 
-model Proveedor {
-  id_proveedor             Int       @id @default(autoincrement())
-  id_empresa               Int // foreign key
-  nombre                   String
-  rif                      String
-  correo                   String?
-  direccion                String?
-  telefono                 String?
-
-  empresa                  Empresa   @relation(fields: [id_empresa], references: [id_empresa]) // Relación muchos a uno con Empresa
-  productos                Producto[]
+model Supplier {
+  supplier_id   Int            @id @default(autoincrement())
+  company_id    Int
+  name          String
+  RIF           String
+  email         String?
+  address       String?
+  phone         String?
+  model_product ModelProduct[]
+  company       Company        @relation(fields: [company_id], references: [company_id], onDelete: Cascade)
 }
 
-model Clientes {
-  id_cliente               Int       @id @default(autoincrement())
-  id_empresa               Int // foreign key
-  cedula                   String   
-  nombre                   String
-  apellido                 String?
-  direccion                String?
-  correo                   String?  
-  telefono                 String?
-
-  empresa                  Empresa   @relation(fields: [id_empresa], references: [id_empresa])
-  ventas                   Ventas[]
+model Customer {
+  customer_id Int     @id @default(autoincrement())
+  company_id  Int
+  first_name  String
+  last_name   String?
+  address     String?
+  email       String?
+  phone       String?
+  visibility  Boolean @default(true)
+  id_card     String
+  company     Company @relation(fields: [company_id], references: [company_id], onDelete: Cascade)
+  sales       Sale[]
 }
 
-model Producto {
-  id_producto              Int       @id @default(autoincrement())
-  id_producto_padre        Int? 
-  id_estado                Int // foreign key
-  id_empresa               Int // foreign key
-  id_proveedor             Int? // foreign key optional
-  sku                      String   
-  nombre                   String
-  foto                     String?
-  descripcion              String?
-  costo                    Decimal?  @db.Decimal(10, 2)
-  precio                   Decimal   @db.Decimal(10, 2)
-
-  estado                   Estado    @relation(fields: [id_estado], references: [id_estado]) // Relación muchos a uno con Estado
-  empresa                  Empresa   @relation(fields: [id_empresa], references: [id_empresa]) // Relación muchos a uno con Empresa
-  proveedor                Proveedor? @relation(fields: [id_proveedor], references: [id_proveedor]) // Relación muchos a uno con Proveedor (opcional)
-
-  // Relationships if parent/child products exist
-  producto_padre           Producto? @relation("ProductoRelacionado", fields: [id_producto_padre], references: [id_producto])
-  productos_hijo           Producto[] @relation("ProductoRelacionado")
-
-  lista_productos          ListaProductos[]
-  stock                    Stock[]
+model Product {
+  product_id    Int            @id @default(autoincrement())
+  company_id    Int
+  visibility    Boolean        @default(true)
+  name          String
+  description   String?
+  model_product ModelProduct[]
+  company       Company        @relation(fields: [company_id], references: [company_id], onDelete: Cascade)
 }
 
-model Rol {
-  id_rol                   Int       @id @default(autoincrement())
-  nombre                   String    @unique
-  descripcion              String?
-
-  usuarios                 User[] 
+model ModelProduct {
+  model_product_id Int           @id @default(autoincrement())
+  product_id       Int
+  supplier_id      Int?
+  state_id         Int           @default(1)
+  visibility       Boolean       @default(true)
+  photo            String?
+  sku              String
+  name             String
+  description      String?
+  cost             Decimal?      @db.Decimal(10, 2)
+  price            Decimal       @db.Decimal(10, 2)
+  product          Product       @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
+  state            State         @relation(fields: [state_id], references: [state_id], onDelete: SetNull)
+  supplier         Supplier?     @relation(fields: [supplier_id], references: [supplier_id])
+  product_list     ProductList[]
+  stock            Stock[]
 }
 
-model ListaProductos {
-  id_lista_productos       Int       @id @default(autoincrement())
-  id_productos             Int // foreign key
-  id_ventas                Int // foreign key
-  cantidad                 Int
-  monto_unitario           Decimal   @db.Decimal(10, 2)
-  monto_total              Decimal   @db.Decimal(10, 2)
+model Role {
+  role_id     Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  users       User[]
+}
 
-  producto                 Producto  @relation(fields: [id_productos], references: [id_producto])
-  venta                    Ventas    @relation(fields: [id_ventas], references: [id_ventas])
+model ProductList {
+  product_list_id  Int          @id @default(autoincrement())
+  sale_id          Int
+  quantity         Int
+  unit_price       Decimal      @db.Decimal(10, 2)
+  total_price      Decimal      @db.Decimal(10, 2)
+  model_product_id Int
+  warehouse_id     Int
+  modelproduct     ModelProduct @relation(fields: [model_product_id], references: [model_product_id])
+  sale             Sale         @relation(fields: [sale_id], references: [sale_id], onDelete: Cascade)
+  warehouse        Warehouse    @relation(fields: [warehouse_id], references: [warehouse_id], onDelete: SetNull)
 }
 
 model Stock {
-  id_stock                 Int       @id @default(autoincrement())
-  id_producto              Int // foreign key
-  id_almacen               Int // foreign key
-  id_movimiento_stock      Int // foreign key
-  cantidad                 Int
-  fecha_creacion           DateTime  @default(now())
-  fecha_actualizacion      DateTime  @updatedAt
-
-  producto                 Producto @relation(fields: [id_producto], references: [id_producto])
-  almacen                  Almacen  @relation(fields: [id_almacen], references: [id_almacen])
-  movimiento_stock         MovimientoStock @relation(fields: [id_movimiento_stock], references: [id_movimiento_stock])
+  stock_id          Int           @id @default(autoincrement())
+  warehouse_id      Int
+  stock_movement_id Int
+  quantity          Int
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+  model_product_id  Int
+  model_product     ModelProduct  @relation(fields: [model_product_id], references: [model_product_id], onDelete: Cascade)
+  stock_movement    StockMovement @relation(fields: [stock_movement_id], references: [stock_movement_id], onDelete: SetNull)
+  warehouse         Warehouse     @relation(fields: [warehouse_id], references: [warehouse_id], onDelete: Cascade)
 }
 
-model MovimientoStock {
-  id_movimiento_stock      Int       @id @default(autoincrement())
-  nombre                   String
-  descripcion              String?
-
-  stock                    Stock[]
+model StockMovement {
+  stock_movement_id Int     @id @default(autoincrement())
+  name              String
+  description       String?
+  stock             Stock[]
 }
 
-model Ventas {
-  id_ventas                Int       @id @default(autoincrement())
-  id_usuario               Int // foreign key
-  id_cliente               Int // foreign key
-  id_estado                Int // foreign key
-  monto_total              Decimal   @db.Decimal(10, 2)
-  fecha                    DateTime @default(now())
-
-  usuario                  User      @relation(fields: [id_usuario], references: [id_user])
-  cliente                  Clientes  @relation(fields: [id_cliente], references: [id_cliente])
-  estado                   Estado    @relation(fields: [id_estado], references: [id_estado]) 
-  venta_pagos              VentaPago[]
-  lista_productos          ListaProductos[]
+model Sale {
+  sale_id       Int           @id @default(autoincrement())
+  user_id       Int
+  customer_id   Int?
+  state_id      Int           @default(2)
+  total_amount  Decimal       @db.Decimal(10, 2)
+  date          DateTime      @default(now())
+  product_list  ProductList[]
+  customer      Customer?     @relation(fields: [customer_id], references: [customer_id])
+  state         State         @relation(fields: [state_id], references: [state_id], onDelete: SetNull)
+  user          User          @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  sale_payments SalePayment[]
 }
 
-model VentaPago {
-  id_venta_pago            Int       @id @default(autoincrement())
-  id_metodo_pago           Int // foreign key
-  id_venta                 Int // foreign key
-  tasa_cambio              Decimal?  @db.Decimal(10, 2)
-  monto_pagado_usd         Decimal?  @db.Decimal(10, 2)
-  fecha                    DateTime @default(now())
-
-  metodo_pago              MetodoPago @relation(fields: [id_metodo_pago], references: [id_metodo_pago]) 
-  venta                    Ventas    @relation(fields: [id_venta], references: [id_ventas]) 
+model SalePayment {
+  sale_payment_id Int         @id @default(autoincrement())
+  sale_id         Int
+  exchange_rate   Decimal?    @db.Decimal(10, 2)
+  amount_paid_usd Decimal?    @db.Decimal(10, 2)
+  date            DateTime    @default(now())
+  payment_coin_id Int
+  sale            Sale        @relation(fields: [sale_id], references: [sale_id], onDelete: Cascade)
+  PaymentCoin     PaymentCoin @relation(fields: [payment_coin_id], references: [payment_coin_id], onDelete: Cascade, map: "fk_sale_paiment_coin")
 }
 
-model MetodoPago {
-  id_metodo_pago           Int       @id @default(autoincrement())
-  id_moneda                Int // foreign key
-  nombre                   String
-  icon                     String?
-  fecha_creacion           DateTime  @default(now())
-  fecha_actualizacion      DateTime  @updatedAt
-
-  moneda                   Moneda    @relation(fields: [id_moneda], references: [id_moneda])
-  venta_pago               VentaPago[] 
+model PaymentCoin {
+  payment_coin_id   Int           @id @default(autoincrement())
+  payment_method_id Int
+  currency_id       Int
+  Currency          Currency      @relation(fields: [currency_id], references: [currency_id], onDelete: Cascade, map: "fk_currency")
+  PaymentMethod     PaymentMethod @relation(fields: [payment_method_id], references: [payment_method_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_payment")
+  SalePayment       SalePayment[]
 }
 
-model Moneda {
-  id_moneda                Int       @id @default(autoincrement()) 
-  codigo                   String?   @unique // Código único de la moneda (ej: USD, EUR)
-  icon                     String?
-  nombre                   String
-  simbolo                  String?
-  tasa_cambio              Decimal?  @db.Decimal(10, 2)
-  fecha_creacion           DateTime  @default(now())
-  fecha_actualizacion      DateTime  @updatedAt
-
-  metodopago               MetodoPago[]
+model PaymentMethod {
+  payment_method_id Int           @id @default(autoincrement())
+  name              String
+  icon              String?
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+  PaymentCoin       PaymentCoin[]
 }
 
-model Estado {
-  id_estado                Int       @id @default(autoincrement())
-  nombre                   String    @unique // Nombre único del estado (ej: Activo, Inactivo, Pendiente)
-
-  ventas                   Ventas[]
-  productos                Producto[]
-  empresas                 Empresa[]
-  usuarios                 User[]
+model Currency {
+  currency_id   Int           @id @default(autoincrement())
+  code          String?       @unique
+  icon          String?
+  name          String
+  symbol        String?
+  exchange_rate Decimal?      @db.Decimal(10, 2)
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+  PaymentCoin   PaymentCoin[]
 }
 
-model Revoked_tokens {
-  id_revoked_tokens        Int       @id @default(autoincrement())
-  token                    String    
-  id_usuario               Int // foreign key
-  revoked_at               DateTime
-  reason                   String
-
-  usuario                  User      @relation(fields: [id_usuario], references: [id_user])
+model State {
+  state_id     Int            @id @default(autoincrement())
+  name         String         @unique
+  modelproduct ModelProduct[]
+  sales        Sale[]
 }
 
-
-
-
+model RevokedToken {
+  revoked_token_id Int      @id @default(autoincrement())
+  token            String
+  user_id          Int
+  revoked_at       DateTime
+  reason           String
+  user             User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+}
