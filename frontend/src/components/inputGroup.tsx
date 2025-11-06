@@ -2,19 +2,19 @@
 import { useRef, useState } from "react";
 export function InputGroup(props: any) {
     
-    const {value, setValue} = props;
+    const {value, setValue, placeholder} = props;
     const inputRef = useRef<HTMLInputElement>(null);
     return (
         <form className='w-full relative  flex justify-evenly' >
                             {/* search client input */}
                             <input type="text" 
                                 ref={inputRef}
-                                className='bg-white rounded-xl p-3 w-full md:w-8/10 h-8 md:h-10 text-black text-sm border border-gray-500 font-semibold  focus:outline-none'
-                                placeholder="Id de la venta" 
+                                className='bg-white rounded-xl p-3 w-full  h-8 md:h-10 text-black text-sm border border-gray-500 font-semibold  focus:outline-none'
+                                placeholder= {placeholder} 
                                 value={value} 
                                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => { setValue(event.target.value)}}/>
                             {/* search client button */}
-                            <button  className='absolute   right-[5%]  w-[5%] h-8 md:text-[var(--color-globalone)] text-black   md:static md:w-8  md:[100%]    transition-all duration-300 flex justify-center items-center   self-center'>
+                            <button  className='absolute   right-[5%]  w-[5%] h-8 md:right-[2%] text-black   md:w-8  md:[100%]    transition-all duration-300 flex justify-center items-center   self-center'>
                             <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"  fill="currentColor"  version="1.1" id="Layer_1" viewBox="0 0 512 512" xmlSpace="preserve">
                                 <g>
                                     <g>

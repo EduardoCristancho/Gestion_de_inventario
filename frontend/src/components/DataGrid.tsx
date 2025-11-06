@@ -1,7 +1,8 @@
-import { DataGrid, GridColDef, GridPaginationModel, GridRowParams, GridRowSelectionModel, GridValueGetter  } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridColumnVisibilityModel, GridPaginationModel, GridRowParams, GridRowSelectionModel, GridValueGetter  } from '@mui/x-data-grid';
 import React, { useState, useEffect, useRef, use, startTransition } from 'react';
 import { Box } from '@mui/material';
 import ActionsButton from './actionsButtons';
+import { set } from 'zod';
 
 interface DataGridComponentProps {
   columns: GridColDef[];
@@ -11,6 +12,8 @@ interface DataGridComponentProps {
   more?: (event: React.MouseEvent, rowId: number)=>void | undefined;
   edit?: (event: React.MouseEvent, rowId: number)=>void | undefined;
   remove?: (event: React.MouseEvent, rowId: number)=>void | undefined;
+  gridColumnVisibilityModel?: GridColumnVisibilityModel;
+  setColumnVisibilityModel?: (columnVisibilityModel: GridColumnVisibilityModel) => void;
 }
 
 export default function DataGridComponent (props: DataGridComponentProps) {  
@@ -115,6 +118,10 @@ return (
           paginationModel={paginationModel.paginationDetails}
           onPaginationModelChange={setPaginationModel}
           onRowSelectionModelChange={handleRowSelection}
+          columnVisibilityModel={props.gridColumnVisibilityModel}
+          onColumnVisibilityModelChange={(newModel: GridColumnVisibilityModel)=>{
+            props.setColumnVisibilityModel!(newModel);
+          }}
           pageSizeOptions={[50, 100]} 
    
           sx={{
@@ -179,6 +186,7 @@ return (
         handleRemove={remove? remove : null} 
         currentSelection={selectedRowId} 
         handleClose = {closeActionsButtons}
+        
         />
       )}
     </>

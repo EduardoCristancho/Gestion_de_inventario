@@ -8,7 +8,7 @@ import TextExpandable from '@/components/TextExpandable';
 import { handleError, NotFoundError, unhandledError } from '@/utils/errorClasess';
 import { saleDto } from '@/components/sale/SaleModalWithData';
 import { productDetails } from '@/components/sale/SaleProduct';
-import ConfirmationContainer from '@/components/confirmationContainer';
+import ConfirmationContainer from '@/components/paymenthConfirmation';
 
 
 export const saleContext = createContext<saleDto | null>(null);

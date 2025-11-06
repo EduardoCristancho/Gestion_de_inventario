@@ -62,6 +62,7 @@ model Supplier {
   email         String?
   address       String?
   phone         String?
+  visibility   Boolean       @default(true)
   model_product ModelProduct[]
   company       Company        @relation(fields: [company_id], references: [company_id], onDelete: Cascade)
 }

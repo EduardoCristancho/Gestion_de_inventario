@@ -3,31 +3,52 @@ import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { ISupplierRepository } from './ISupplier';
 import { GetSupplierDto } from './dto/get-supplier.dto';
+import { paginationQueryDto } from '../clients/dto/pagination.dto';
 @Injectable()
 export class SupplierService {
   constructor(@Inject('ISupplierRepository') private readonly supplierRepository: ISupplierRepository) {}
-  create(createSupplierDto: CreateSupplierDto) {
-    return 'This action adds a new supplier';
+  create(createSupplierDto: CreateSupplierDto, companyId: number) {
+    return this.supplierRepository.create(createSupplierDto, companyId);
   }
 
-  async findAll(company_id: number) {
-    const result = await this.supplierRepository.findAll(company_id);
-    if (result.length === 0) {
-      throw new NotFoundException('No suppliers found');
+  async findAll(company_id: number, paginationQuery: paginationQueryDto) {
+
+    if(paginationQuery.limit !== undefined && paginationQuery.page !== undefined){
+      const skip = paginationQuery.page * paginationQuery.limit;
+      const take = paginationQuery.limit;
+      return this.supplierRepository.findAll(company_id, skip, take);
     }
-    const suppliers = result.map((supplier : any)=>{ return GetSupplierDto.parseToGetSupplierDto(supplier)});;
-    return suppliers;
+    return this.supplierRepository.findAll(company_id);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} supplier`;
+  async findOne(id: number, companyId: number) {
+    const supplier = await this.supplierRepository.findOne(id, companyId);
+    if(!supplier){
+      throw new NotFoundException('Supplier not found');
+    }
+    return supplier;
+  }
+  async findOneComplete(id: number, companyId: number) {
+    const supplier = await this.supplierRepository.findOneComplete(id, companyId);
+    if(!supplier){
+      throw new NotFoundException('Supplier not found');
+    }
+    return supplier;
   }
 
-  update(id: number, updateSupplierDto: UpdateSupplierDto) {
-    return `This action updates a #${id} supplier`;
+  update(id: number, updateSupplierDto: UpdateSupplierDto, companyId: number) {
+    if(!updateSupplierDto){
+      throw new NotFoundException('No data to update');
+    }
+
+    //si el proveedor no existe, se lanza una excepcion
+    const supplier = this.findOne(id, companyId);
+    return this.supplierRepository.update(id, updateSupplierDto, companyId);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} supplier`;
+  remove(id: number, companyId: number) {
+    //si el proveedor no existe, se lanza una excepcion
+    const supplier = this.findOne(id, companyId);
+    return this.supplierRepository.remove(id, companyId);
   }
 }

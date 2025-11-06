@@ -1,6 +1,6 @@
 'use client'
-import { GridColDef, GridPaginationModel, GridRowSelectionModel} from '@mui/x-data-grid';
-import React, { useState, useEffect, useRef, use, startTransition, useMemo } from 'react';
+import { GridColDef, GridPaginationModel} from '@mui/x-data-grid';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { InputGroup } from '@/components/inputGroup';
 
 import DataGridComponent from '@/components/DataGrid';
@@ -10,7 +10,7 @@ import FilterPanel from '@/components/FilterPanel';
 import { SalesModal } from '@/components/sale/SalesModal';
 import { redirect } from 'next/navigation';
 import { NotFoundError, unhandledError, handleError } from '@/utils/errorClasess';
-import { DeleteModal } from '@/components/sale/deleteModal';
+import { DeleteModal } from '@/components/deleteModal';
 
 interface Sale {
   id: number;
@@ -125,7 +125,10 @@ export default function SalesRecords() {
 
       setRows([]);
       setLoading(true);
-      const response = await fetch(`/api/sales/${inputSearh}`);
+      const response = await fetch(`/api/sales/${inputSearh}`,{
+        method: 'GET',
+        credentials: 'include',
+      });
       if (response.status !== 200 && response.status !== 404) {
         throw new unhandledError("Error al cargar los datos de las ventas, intente mas tarde");
       }
@@ -194,6 +197,20 @@ export default function SalesRecords() {
      setSaleId(currentSelection);
     }
 
+  async function handleSaleDelete(): Promise<boolean> {
+    try {
+      const response = await fetch(`/api/sales/${saleId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!response.ok) return false;
+      setRows(rows.filter((item) => item.id !== saleId));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
     const handlePaginationChange = async(pagination: GridPaginationModel) => {
       setPaginationModel({paginationDetails : pagination, totalRows: paginationModel.totalRows});
     }
@@ -209,6 +226,7 @@ export default function SalesRecords() {
           <InputGroup
             value={inputSearh}
             setValue={setInputSearch}
+            placeholder="Id de la venta"
           />
         <div className="shrink-0 relative">
           <FilterButton
@@ -244,7 +262,13 @@ export default function SalesRecords() {
       )}
       {
         showDeleteModal && (
-          <DeleteModal setDeleteModal={setShowDeleteModal} elementId={saleId} data={rows} setData= {setRows}/>
+          <DeleteModal 
+            setDeleteModal={setShowDeleteModal} 
+            onDelete={handleSaleDelete}
+            successMessage="¡Venta eliminada correctamente!"
+            errorMessage="Hubo un error al eliminar la venta."
+            confirmMessage="¿Deseas eliminar esta venta?" 
+          />
         )
       }
     </div>
