@@ -1,0 +1,4 @@
+Inventario Funcionamiento de status:
+
+1)un modelo puede tener un status disponible o agotado en base a su cantidad , esto se hace en backend o bd
+y ya desde el frontend se valida lo necesario

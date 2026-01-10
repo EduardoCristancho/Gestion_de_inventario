@@ -1,0 +1,234 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Empresa {
+  id_empresa               Int       @id @default(autoincrement())
+  id_estado                Int // foreign key
+  logo_empresa             String?
+  nombre                   String
+  rif                      String?   @unique 
+  correo                   String?   @unique
+  direccion                String?
+  telefono                 String?
+
+  estado                   Estado    @relation(fields: [id_estado], references: [id_estado])
+  clientes                 Clientes[]
+  almacenes                Almacen[]
+  proveedores              Proveedor[]
+  productos                Producto[] 
+  user                     User[] 
+}
+
+model Almacen {
+  id_almacen               Int       @id @default(autoincrement())
+  id_empresa               Int // foreign key
+  nombre                   String
+  correo                   String?
+  direccion                String?
+  telefono                 String?
+
+  empresa                  Empresa   @relation(fields: [id_empresa], references: [id_empresa]) 
+  usuarios                 User[]
+  stock                    Stock[]
+}
+
+model User {
+  id_user                  Int       @id @default(autoincrement())
+  id_empresa               Int // foreign key
+  id_rol                   Int // foreign key
+  id_almacen               Int // foreign key
+  id_estado                Int // foreign key
+  username                 String    @unique
+  password                 String
+  foto_user                String?
+
+  empresa                  Empresa   @relation(fields: [id_empresa], references: [id_empresa])
+  rol                      Rol       @relation(fields: [id_rol], references: [id_rol]) 
+  almacen                  Almacen   @relation(fields: [id_almacen], references: [id_almacen]) 
+  estado                   Estado    @relation(fields: [id_estado], references: [id_estado]) 
+  revoked_tokens           Revoked_tokens[]
+  ventas                   Ventas[]
+}
+
+model Proveedor {
+  id_proveedor             Int       @id @default(autoincrement())
+  id_empresa               Int // foreign key
+  nombre                   String
+  rif                      String
+  correo                   String?
+  direccion                String?
+  telefono                 String?
+
+  empresa                  Empresa   @relation(fields: [id_empresa], references: [id_empresa]) // Relación muchos a uno con Empresa
+  productos                Producto[]
+}
+
+model Clientes {
+  id_cliente               Int       @id @default(autoincrement())
+  id_empresa               Int // foreign key
+  cedula                   String   
+  nombre                   String
+  apellido                 String?
+  direccion                String?
+  correo                   String?  
+  telefono                 String?
+
+  empresa                  Empresa   @relation(fields: [id_empresa], references: [id_empresa])
+  ventas                   Ventas[]
+}
+
+model Producto {
+  id_producto              Int       @id @default(autoincrement())
+  id_producto_padre        Int? 
+  id_estado                Int // foreign key
+  id_empresa               Int // foreign key
+  id_proveedor             Int? // foreign key optional
+  sku                      String   
+  nombre                   String
+  foto                     String?
+  descripcion              String?
+  costo                    Decimal?  @db.Decimal(10, 2)
+  precio                   Decimal   @db.Decimal(10, 2)
+
+  estado                   Estado    @relation(fields: [id_estado], references: [id_estado]) // Relación muchos a uno con Estado
+  empresa                  Empresa   @relation(fields: [id_empresa], references: [id_empresa]) // Relación muchos a uno con Empresa
+  proveedor                Proveedor? @relation(fields: [id_proveedor], references: [id_proveedor]) // Relación muchos a uno con Proveedor (opcional)
+
+  // Relationships if parent/child products exist
+  producto_padre           Producto? @relation("ProductoRelacionado", fields: [id_producto_padre], references: [id_producto])
+  productos_hijo           Producto[] @relation("ProductoRelacionado")
+
+  lista_productos          ListaProductos[]
+  stock                    Stock[]
+}
+
+model Rol {
+  id_rol                   Int       @id @default(autoincrement())
+  nombre                   String    @unique
+  descripcion              String?
+
+  usuarios                 User[] 
+}
+
+model ListaProductos {
+  id_lista_productos       Int       @id @default(autoincrement())
+  id_productos             Int // foreign key
+  id_ventas                Int // foreign key
+  cantidad                 Int
+  monto_unitario           Decimal   @db.Decimal(10, 2)
+  monto_total              Decimal   @db.Decimal(10, 2)
+
+  producto                 Producto  @relation(fields: [id_productos], references: [id_producto])
+  venta                    Ventas    @relation(fields: [id_ventas], references: [id_ventas])
+}
+
+model Stock {
+  id_stock                 Int       @id @default(autoincrement())
+  id_producto              Int // foreign key
+  id_almacen               Int // foreign key
+  id_movimiento_stock      Int // foreign key
+  cantidad                 Int
+  fecha_creacion           DateTime  @default(now())
+  fecha_actualizacion      DateTime  @updatedAt
+
+  producto                 Producto @relation(fields: [id_producto], references: [id_producto])
+  almacen                  Almacen  @relation(fields: [id_almacen], references: [id_almacen])
+  movimiento_stock         MovimientoStock @relation(fields: [id_movimiento_stock], references: [id_movimiento_stock])
+}
+
+model MovimientoStock {
+  id_movimiento_stock      Int       @id @default(autoincrement())
+  nombre                   String
+  descripcion              String?
+
+  stock                    Stock[]
+}
+
+model Ventas {
+  id_ventas                Int       @id @default(autoincrement())
+  id_usuario               Int // foreign key
+  id_cliente               Int // foreign key
+  id_estado                Int // foreign key
+  monto_total              Decimal   @db.Decimal(10, 2)
+  fecha                    DateTime @default(now())
+
+  usuario                  User      @relation(fields: [id_usuario], references: [id_user])
+  cliente                  Clientes  @relation(fields: [id_cliente], references: [id_cliente])
+  estado                   Estado    @relation(fields: [id_estado], references: [id_estado]) 
+  venta_pagos              VentaPago[]
+  lista_productos          ListaProductos[]
+}
+
+model VentaPago {
+  id_venta_pago            Int       @id @default(autoincrement())
+  id_metodo_pago           Int // foreign key
+  id_venta                 Int // foreign key
+  tasa_cambio              Decimal?  @db.Decimal(10, 2)
+  monto_pagado_usd         Decimal?  @db.Decimal(10, 2)
+  fecha                    DateTime @default(now())
+
+  metodo_pago              MetodoPago @relation(fields: [id_metodo_pago], references: [id_metodo_pago]) 
+  venta                    Ventas    @relation(fields: [id_venta], references: [id_ventas]) 
+}
+
+model MetodoPago {
+  id_metodo_pago           Int       @id @default(autoincrement())
+  id_moneda                Int // foreign key
+  nombre                   String
+  icon                     String?
+  fecha_creacion           DateTime  @default(now())
+  fecha_actualizacion      DateTime  @updatedAt
+
+  moneda                   Moneda    @relation(fields: [id_moneda], references: [id_moneda])
+  venta_pago               VentaPago[] 
+}
+
+model Moneda {
+  id_moneda                Int       @id @default(autoincrement()) 
+  codigo                   String?   @unique // Código único de la moneda (ej: USD, EUR)
+  icon                     String?
+  nombre                   String
+  simbolo                  String?
+  tasa_cambio              Decimal?  @db.Decimal(10, 2)
+  fecha_creacion           DateTime  @default(now())
+  fecha_actualizacion      DateTime  @updatedAt
+
+  metodopago               MetodoPago[]
+}
+
+model Estado {
+  id_estado                Int       @id @default(autoincrement())
+  nombre                   String    @unique // Nombre único del estado (ej: Activo, Inactivo, Pendiente)
+
+  ventas                   Ventas[]
+  productos                Producto[]
+  empresas                 Empresa[]
+  usuarios                 User[]
+}
+
+model Revoked_tokens {
+  id_revoked_tokens        Int       @id @default(autoincrement())
+  token                    String    
+  id_usuario               Int // foreign key
+  revoked_at               DateTime
+  reason                   String
+
+  usuario                  User      @relation(fields: [id_usuario], references: [id_user])
+}
+
+
+
+

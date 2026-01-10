@@ -16,13 +16,15 @@ export default function Header() {
 
         <h1 className="text-lg font-semibold text-globalone">AppComercio</h1>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center justify-center">
           <ThemeSwitcher />
           <Link
             href="/configuraciones"
             className="text-globalone hover:text-gray-700"
           >
-            <Settings className="h-5 w-5 globalone" />
+            <button className="text-globalone transition-all duration-150 p-[7px] rounded-lg hover:bg-tertiary/100">
+              <Settings className="h-5 w-5 " />
+            </button>
           </Link>
         </div>
       </div>

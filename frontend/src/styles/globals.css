@@ -1,44 +1,42 @@
 @import "tailwindcss";
 /* styles/themes.css */
-@theme
-
-  [data-theme='oscuro'] {
+[data-theme='oscuro'] {
   --color-primary: #1A1A1A; /* Fondo principal oscuro o para textos*/
   --color-secondary: #29D3F1; /* Color azul general para cuadros , textos  */
+  --color-secondaryhover: #1bbcd8;
   --color-tertiary: #393939; /* Fondo secundario oscuro general para cuadros , etc */
+  --color-boxone: #393939;
+  --color-buttonplus: #11c15b;
+  --color-globalsecond: #7EF1D2;
+  --color-globaltwo: white;
   --color-quaternary: #252525; /* Fondo barra de navegacion oscuro */
   --color-globalone: white; /* Texto blanco */
+  --color-globalinverse : #6c6c6c;
   --color-accent: #e53e3e;
   --color-info: #3182ce;
   --color-success: #48bb78;
   --color-warning: #f6ad55;
-  --color-danger: #e53e3e;
+  --color-danger: #d41f1f;
   --color-neutral: #a0aec0;
+  --color-card : #6079AA;
   }
   
   [data-theme='claro'] {
   --color-primary: white; /* Fondo principal claro o para textos*/
   --color-secondary: #29D3F1; /* Color azul general para cuadros , textos  */
-  --color-tertiary: #F1F1F1; /* Fondo secundario claro general para cuadros , etc */
+  --color-tertiary: #F1F1F1; /* Fondo secundario claro general para 
+  cuadros , etc */
+  --color-globalinverse : #c5c5c5;
   --color-quaternary: #F7FAFC; /* Fondo barra de navegacion claro */
+  --color-boxone: #d0f3f6;
   --color-globalone: black; /* Texto negro */
+  --color-globalsecond: #2ae6b3;
+  --color-globaltwo: white;
   --color-accent: #e53e3e;
   --color-info: #3182ce;
   --color-success: #48bb78;
   --color-warning: #f6ad55;
-  --color-danger: #e53e3e;
+  --color-danger: #f33a3a;
   --color-neutral: #a0aec0;
-  }
-  
-  ::-webkit-scrollbar {
-    background-color: var(--color-primary);
-    color: #29D3F1;
-    border-radius: 5px;
-    width: 10px;
-    margin-left: 3px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: var(--color-secondary);
-    border-radius: 5px;
+  --color-card : #6079AA;
   }

@@ -19,7 +19,7 @@ function ThemeSwitcher() {
   return (
     <button
       onClick={toggleTheme}
-      className="text-globalone hover:text-gray-700"
+      className="text-globalone transition-all duration-300 p-[7px] rounded-lg hover:bg-tertiary/100 "
       aria-label="Cambiar tema"
     >
       {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
