@@ -1,0 +1,17 @@
+{
+  "name": "gestion_inventario",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run start:front\" \"npm run start:back\"",
+    "start:front": "cd frontend && npm run dev",
+    "start:back": "cd backend && npm run start:dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}

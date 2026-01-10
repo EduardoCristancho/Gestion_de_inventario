@@ -11,6 +11,7 @@ function Ventas() {
 
   const [ShowConfirmationContainer, setShowConfirmationContainer] = useState(false)
   const [showSearchContainer, setShowSearchContainer] = useState(false)
+  const [displayFindClient, setDisplayFindClient] = useState(false);
 
   return (
     <ProductsProvider>
