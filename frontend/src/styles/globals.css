@@ -17,7 +17,7 @@
   }
   
   [data-theme='claro'] {
-    --color-primary: white; /* Fondo principal claro o para textos*/
+  --color-primary: white; /* Fondo principal claro o para textos*/
   --color-secondary: #29D3F1; /* Color azul general para cuadros , textos  */
   --color-tertiary: #F1F1F1; /* Fondo secundario claro general para cuadros , etc */
   --color-quaternary: #F7FAFC; /* Fondo barra de navegacion claro */
@@ -28,4 +28,17 @@
   --color-warning: #f6ad55;
   --color-danger: #e53e3e;
   --color-neutral: #a0aec0;
+  }
+  
+  ::-webkit-scrollbar {
+    background-color: var(--color-primary);
+    color: #29D3F1;
+    border-radius: 5px;
+    width: 10px;
+    margin-left: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-secondary);
+    border-radius: 5px;
   }
