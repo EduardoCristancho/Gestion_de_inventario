@@ -15,6 +15,7 @@ interface EnterpriseInfo {
   address: string;
   email: string;
   phone: string;
+  logo?: File | null;
 }
 
 async function fetchEnterpriseInfo() {
@@ -33,12 +34,17 @@ async function saveEnterpriseInfo(info: EnterpriseInfo) {
     return false;
   }
 
+  const formData = new FormData();
+  formData.append("name", info.name);
+  formData.append("rif", info.rif);
+  formData.append("address", info.address);
+  formData.append("email", info.email);
+  formData.append("phone", info.phone);
+  if (info.logo) formData.append("logo", info.logo);
+
   const response = await fetch("/api/enterprisem", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(info),
+    body: formData,
   });
   if (!response.ok) {
     throw new Error("Failed to save enterprise info");
@@ -55,12 +61,23 @@ export default function Settings() {
       address: "Calle Falsa 123, Ciudad, País",
       email: "info@miempresa.com",
       phone: "04247089654",
+      logo: null,
     }
   );
+  const [logoPreview, setLogoPreview] = useState<string>(
+    "https://png.pngtree.com/png-clipart/20200727/original/pngtree-professional-logo-design-templates-png-image_5391639.jpg"
+  );
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setEnterpriseInfo({ ...enterpriseInfo, logo: file });
+    setLogoPreview(URL.createObjectURL(file));
+  };
 
   useEffect(() => {
-
-    /*const loadEnterpriseInfo = async () => {
+    /*
+    const loadEnterpriseInfo = async () => {
       try {
         const info = await fetchEnterpriseInfo();
         setEnterpriseInfo(info);
@@ -68,8 +85,21 @@ export default function Settings() {
         console.error("Error fetching enterprise info:", error);
       }
     };
-
-    loadEnterpriseInfo();*/
+    loadEnterpriseInfo();
+    
+    const loadLogo = async () => {
+      try {
+        const response = await fetch("/api/enterprise/logo");
+        if (!response.ok) throw new Error("Failed to fetch logo");
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        setLogoPreview(objectUrl);
+      } catch (error) {
+        console.error("Error fetching logo:", error);
+      }
+    };
+    loadLogo();
+    */
   }, []);
 
   return (
@@ -90,13 +120,19 @@ export default function Settings() {
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <div className="relative group">
                 <img
-                  src="https://png.pngtree.com/png-clipart/20200727/original/pngtree-professional-logo-design-templates-png-image_5391639.jpg"
+                  src={logoPreview}
                   alt="Logo de la empresa"
                   className="rounded-full h-24 w-24 sm:h-32 sm:w-32 object-cover border-4 border-white shadow-lg"
                 />
-                <button className="absolute bottom-0 right-0 bg-[#29D3F1] hover:opacity-90 text-white rounded-full p-3 shadow-lg transition-all duration-200 transform hover:scale-110">
+                <label className="absolute bottom-0 right-0 bg-[#29D3F1] hover:opacity-90 text-white rounded-full p-3 shadow-lg transition-all duration-200 transform hover:scale-110 cursor-pointer">
                   <FaImage className="text-sm" />
-                </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleLogoChange}
+                  />
+                </label>
               </div>
               <div className="text-center sm:text-left">
                 <h2 className="text-xl font-semibold text-globalone">
