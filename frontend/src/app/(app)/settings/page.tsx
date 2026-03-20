@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { showToast } from "nextjs-toast-notify";
 import {
   FaBuilding,
   FaEnvelope,
@@ -28,9 +29,17 @@ async function fetchEnterpriseInfo() {
 }
 
 async function saveEnterpriseInfo(info: EnterpriseInfo) {
-
   if (!info.name || !info.rif || !info.address || !info.email || !info.phone) {
-    alert("Por favor, completa todos los campos antes de guardar.");
+    showToast.warning(
+      "Por favor, completa todos los campos antes de guardar.",
+      {
+        duration: 5000,
+        position: "top-center",
+        transition: "bounceIn",
+        sound: true,
+        progress: true,
+      },
+    );
     return false;
   }
 
@@ -42,6 +51,16 @@ async function saveEnterpriseInfo(info: EnterpriseInfo) {
   formData.append("phone", info.phone);
   if (info.logo) formData.append("logo", info.logo);
 
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(info.email)) {
+    showToast.error("El correo electrónico no es válido.", {
+      duration: 4000,
+      position: "top-center",
+      transition: "bounceIn",
+      progress: true,
+    });
+    return false;
+  }
+
   const response = await fetch("/api/enterprisem", {
     method: "POST",
     body: formData,
@@ -52,21 +71,22 @@ async function saveEnterpriseInfo(info: EnterpriseInfo) {
   return response.json();
 }
 
-
 export default function Settings() {
-  const [enterpriseInfo, setEnterpriseInfo] = useState<EnterpriseInfo>(
-   {
-      name: "Mi Empresa S.A.",
-      rif: "1234567890",
-      address: "Calle Falsa 123, Ciudad, País",
-      email: "info@miempresa.com",
-      phone: "04247089654",
-      logo: null,
-    }
-  );
+  const [enterpriseInfo, setEnterpriseInfo] = useState<EnterpriseInfo>({
+    name: "Mi Empresa S.A.",
+    rif: "1234567890",
+    address: "Calle Falsa 123, Ciudad, País",
+    email: "info@miempresa.com",
+    phone: "04247089654",
+    logo: null,
+  });
   const [logoPreview, setLogoPreview] = useState<string>(
-    "https://png.pngtree.com/png-clipart/20200727/original/pngtree-professional-logo-design-templates-png-image_5391639.jpg"
+    "https://png.pngtree.com/png-clipart/20200727/original/pngtree-professional-logo-design-templates-png-image_5391639.jpg",
   );
+  const [emailError, setEmailError] = useState("");
+
+  const isValidEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -156,8 +176,10 @@ export default function Settings() {
                 placeholder="Ingrese el nombre de la empresa"
                 className="w-full px-4 py-3 bg-tertiary border border-tertiary rounded-lg text-globalone placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[#29D3F1] focus:border-transparent transition-all"
                 value={enterpriseInfo?.name}
-                onChange={(e) => setEnterpriseInfo({...enterpriseInfo, name: e.target.value})}
-             />
+                onChange={(e) =>
+                  setEnterpriseInfo({ ...enterpriseInfo, name: e.target.value })
+                }
+              />
             </div>
 
             <div className="space-y-2">
@@ -177,8 +199,10 @@ export default function Settings() {
                 }}
                 className="w-full px-4 py-3 bg-tertiary border border-tertiary rounded-lg text-globalone placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[#29D3F1] focus:border-transparent transition-all"
                 value={enterpriseInfo?.rif}
-                onChange={(e) => setEnterpriseInfo({...enterpriseInfo, rif: e.target.value})}
-             />
+                onChange={(e) =>
+                  setEnterpriseInfo({ ...enterpriseInfo, rif: e.target.value })
+                }
+              />
             </div>
 
             <div className="space-y-2">
@@ -191,8 +215,13 @@ export default function Settings() {
                 rows={3}
                 className="w-full px-4 py-3 bg-tertiary border border-tertiary rounded-lg text-globalone placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[#29D3F1] focus:border-transparent transition-all resize-none"
                 value={enterpriseInfo?.address}
-                onChange={(e) => setEnterpriseInfo({...enterpriseInfo, address: e.target.value})}
-             />
+                onChange={(e) =>
+                  setEnterpriseInfo({
+                    ...enterpriseInfo,
+                    address: e.target.value,
+                  })
+                }
+              />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -206,7 +235,12 @@ export default function Settings() {
                   placeholder="empresa@ejemplo.com"
                   className="w-full px-4 py-3 bg-tertiary border border-tertiary rounded-lg text-globalone placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[#29D3F1] focus:border-transparent transition-all"
                   value={enterpriseInfo?.email}
-                  onChange={(e) => setEnterpriseInfo({...enterpriseInfo, email: e.target.value})}
+                  onChange={(e) =>
+                    setEnterpriseInfo({
+                      ...enterpriseInfo,
+                      email: e.target.value,
+                    })
+                  }
                 />
               </div>
 
@@ -227,23 +261,48 @@ export default function Settings() {
                   }}
                   className="w-full px-4 py-3 bg-tertiary border border-tertiary rounded-lg text-globalone placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[#29D3F1] focus:border-transparent transition-all"
                   value={enterpriseInfo?.phone}
-                  onChange={(e) => setEnterpriseInfo({...enterpriseInfo, phone: e.target.value})}
+                  onChange={(e) =>
+                    setEnterpriseInfo({
+                      ...enterpriseInfo,
+                      phone: e.target.value,
+                    })
+                  }
                 />
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <button className="flex-1 bg-[#48bb78] hover:opacity-90 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
-              onClick={() => {
-                saveEnterpriseInfo(enterpriseInfo)
-                  .then((result) => {
-                    if (result) alert("Información de la empresa guardada exitosamente");
-                  })
-                  .catch((error) => {
-                    console.error("Error saving enterprise info:", error);
-                    alert("Error al guardar la información de la empresa");
-                  });
-              }}
+              <button
+                className="flex-1 bg-[#48bb78] hover:opacity-90 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                onClick={() => {
+                  saveEnterpriseInfo(enterpriseInfo)
+                    .then((result) => {
+                      if (result)
+                        showToast.success(
+                          "Información de la empresa guardada exitosamente",
+                          {
+                            duration: 5000,
+                            position: "top-center",
+                            transition: "bounceIn",
+                            sound: true,
+                            progress: true,
+                          },
+                        );
+                    })
+                    .catch((error) => {
+                      console.error("Error saving enterprise info:", error);
+                      showToast.error(
+                        "Error al guardar la información de la empresa",
+                        {
+                          duration: 5000,
+                          position: "top-center",
+                          transition: "bounceIn",
+                          sound: true,
+                          progress: true,
+                        },
+                      );
+                    });
+                }}
               >
                 Guardar Cambios
               </button>
