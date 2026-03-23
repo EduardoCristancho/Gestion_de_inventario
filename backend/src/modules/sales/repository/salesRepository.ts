@@ -14,7 +14,7 @@ export default class salesRepository implements ISalesRepository {
     async findAll(CompanyId: number ,paginationQuery?: { skip: number; take: number; }, filters?: salesFilterDto): Promise<{ sales: any; length: number; }> {
       
         try{
-            let where: any = {user: {company_id: CompanyId}, state_id: 1};
+            let where: any = {User: {company_id: CompanyId}, state_id: 1};
             if (SalesService.validateDateFormat(filters?.startDate as string) && SalesService.validateDateFormat(filters?.endDate as string)) {
             where.date = {
                 gte: new Date(filters?.startDate as string),
@@ -31,7 +31,7 @@ export default class salesRepository implements ISalesRepository {
             }
 
             if (filters?.clientName) {
-            where.customer = {
+            where.Customer = {
                 first_name: {
                 contains: filters?.clientName?? undefined,
                 mode: 'insensitive'
@@ -47,7 +47,7 @@ export default class salesRepository implements ISalesRepository {
                         date: 'desc'
                     },
                     include:{
-                        customer: {
+                        Customer: {
                             select: {
                                 first_name: true,
                                 last_name: true
@@ -107,7 +107,7 @@ export default class salesRepository implements ISalesRepository {
         const sale : SaleEntityUnique | null = await this.prisma.sale.findUnique({
             where: {
                 sale_id: id,
-                user: {
+                User: {
                     company_id: companyId
                 },
                 state_id: 1
@@ -116,7 +116,7 @@ export default class salesRepository implements ISalesRepository {
                 sale_id: true,
                 date: true,
                 total_amount: true,
-                customer: {
+                Customer: {
                     select: {
                         customer_id: true,
                         id_card: true,
@@ -125,18 +125,18 @@ export default class salesRepository implements ISalesRepository {
                         phone: true,
                     }
                 },
-                user:{
+                User:{
                     select: {
                         user_id: true,
                         username: true,
                     }
                 },
-                product_list: {
+                ProductList: {
                     select: {
                         product_list_id: true,
                         quantity: true,
                         total_price: true,
-                        modelproduct: {
+                        ModelProduct: {
                             select: {
                                 model_product_id: true,
                                 sku: true,
@@ -146,7 +146,7 @@ export default class salesRepository implements ISalesRepository {
                         }
                     }
                 },
-                sale_payments: {
+                SalePayment: {
                     select: {
                         sale_payment_id: true,
                         payment_coin_id: true,
@@ -212,7 +212,7 @@ export default class salesRepository implements ISalesRepository {
                 await prisma.sale.update({
                     where: {
                         sale_id: id,
-                        user: {
+                        User: {
                             company_id: company_id
                         }
                     },
@@ -282,7 +282,7 @@ export default class salesRepository implements ISalesRepository {
             return this.prisma.sale.update({
                 where: {
                     sale_id: id,
-                    user: {
+                    User: {
                         company_id: company_id
                     }
                 },

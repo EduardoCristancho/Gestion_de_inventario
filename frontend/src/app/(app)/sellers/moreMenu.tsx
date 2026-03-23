@@ -21,7 +21,7 @@ function MoreMenu({ sellerId }: { sellerId: number }) {
   const router = useRouter();
 
   function handleEditSeller(sellerId: number) {
-    router.push(`/editSeller?sellerId=${sellerId}`);
+    router.push(`sellers/edit?sellerId=${sellerId}`);
   }
 
   return (

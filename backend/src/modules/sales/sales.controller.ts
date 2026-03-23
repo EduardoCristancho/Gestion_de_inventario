@@ -4,7 +4,7 @@ import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/edit-sale.dto';
 import { paginationQueryDto, PaginationResponse } from '../clients/dto/pagination.dto';
 import { GetSalesDto, salesFilterDto } from './dto/get-sales.dto';
-import { User } from '../userDecorator';
+import { User } from '../auth/userDecorator';
 
 
 @Controller('sales')

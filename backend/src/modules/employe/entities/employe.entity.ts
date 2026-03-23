@@ -2,10 +2,10 @@ export class getEmploye {
     user_id: number;
     company_id: number;
     visibility: boolean;
-    role: {
+    Role: {
         role_id: number; 
         name: string };
-    warehouse: { 
+    Warehouse: { 
         warehouse_id: 
         number; name: string };
     username: string;

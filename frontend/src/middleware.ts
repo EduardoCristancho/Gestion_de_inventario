@@ -1,4 +1,4 @@
-/*import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
  
 // This function can be marked `async` if using `await` inside
@@ -40,22 +40,4 @@ export const config = {
   matcher: [
       "/((?!login|api/auth|_next/static|_next/image|favicon.ico).*)",
     ],
-}*/
-
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-
-// Es vital que la función se llame 'middleware' o sea el 'default export'
-export function middleware(request: NextRequest) {
-  // 1. Obtenemos la URL actual
-  const url = request.nextUrl.clone();
-  
-  // 2. Simplemente retornamos 'next()' para que la solicitud continúe 
-  // sin bloquear ni redirigir a nadie.
-  return NextResponse.next();
 }
-
-// Opcional: Configura en qué rutas debe ejecutarse
-export const config = {
-  matcher: '/:path*',
-};

@@ -1,16 +1,16 @@
 import { LuSearch } from "react-icons/lu";
-import { client } from "./page";
+import { warehouse } from "./page";
 import { useState } from "react";
 
 function SearchClients({
   clients,
   setClients,
 }: {
-  clients: client[];
-  setClients: (clients: client[]) => void;
+  clients: warehouse[];
+  setClients: (clients: warehouse[]) => void;
 }) {
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [clientsCopy, setClientsCopy] = useState<client[]>(clients);
+  const [clientsCopy, setClientsCopy] = useState<warehouse[]>(clients);
   const [isSearching, setIsSearching] = useState(false);
 
   async function handleSearch() {

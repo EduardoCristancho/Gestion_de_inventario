@@ -1,7 +1,7 @@
 "use client";
 
 import RecordOrEditClient from "@/components/recordOrEditClient";
-import { client } from "../clients/page";
+import {client} from "../page";
 
 function recordClient(client: client) {
   fetch("/api/recordClient", {

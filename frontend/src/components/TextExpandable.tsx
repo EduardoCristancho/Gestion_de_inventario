@@ -7,13 +7,6 @@ export default function TextExpandable({
   texto: string;
   lineas?: number;
 }) {
-  const clasesLineClamp = [
-  "line-clamp-1",
-  "line-clamp-2",
-  "line-clamp-3",
-  "line-clamp-4",
-  "line-clamp-5",
-];
   const [expandido, setExpandido] = useState(false);
   const [esTruncado, setEsTruncado] = useState(false);
   const textoRef = useRef<HTMLParagraphElement>(null);
@@ -28,11 +21,11 @@ export default function TextExpandable({
   }, [texto, expandido]);
 
   return (
-    <div className="relative ">
+    <div className="relative">
       <p
         ref={textoRef}
         className={`transition-all duration-300 text-ellipsis ${
-          expandido ? "" : `line-clamp-${lineas }`
+          expandido ? "" : `line-clamp-${lineas}`
         }`}
       >
         {texto}
@@ -40,7 +33,7 @@ export default function TextExpandable({
       {esTruncado && (
         <button
           onClick={() => setExpandido((prev) => !prev)}
-          className="text-blue-500 hover:underline m-0 text-sm"
+          className="text-[var(--color-info)] hover:text-[var(--color-info)]/80 text-xs font-medium mt-1 transition-colors"
         >
           {expandido ? "Ver menos" : "Ver más"}
         </button>

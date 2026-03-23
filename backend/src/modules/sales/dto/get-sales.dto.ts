@@ -64,16 +64,16 @@ export class saleDto{
         this.date = sale.date;
         this.total = sale.total_amount.toNumber();
         this.seller = {
-            id: sale.user.user_id,
-            User: sale.user.username
+            id: sale.User.user_id,
+            User: sale.User.username
         };
         this.client = {
-            id: sale.customer?.customer_id ?? 0,
-            identifier: sale.customer?.id_card ?? "sin cedula",
-            name: sale.customer ? sale.customer?.first_name + " " + (sale.customer?.last_name ?? "") : "Generico",
-            phone: sale.customer?.phone ?? "sin telefono"
+            id: sale.Customer?.customer_id ?? 0,
+            identifier: sale.Customer?.id_card ?? "sin cedula",
+            name: sale.Customer ? sale.Customer?.first_name + " " + (sale.Customer?.last_name ?? "") : "Generico",
+            phone: sale.Customer?.phone ?? "sin telefono"
         };
-        this.paymentMethods = sale.sale_payments.map(payment => ({
+        this.paymentMethods = sale.SalePayment.map(payment => ({
             id: payment.sale_payment_id,
             PaymentId: payment.payment_coin_id,
             PaymentMethod: payment.PaymentCoin.PaymentMethod.name,
@@ -82,12 +82,12 @@ export class saleDto{
             amount: payment.amount_paid_usd? payment.amount_paid_usd.toNumber(): 0,
             exchangeRate: payment.exchange_rate? payment.exchange_rate.toNumber(): 0
         }));
-        this.products = sale.product_list.map(product => ({
+        this.products = sale.ProductList.map(product => ({
             id : product.product_list_id,
-            productId: product.modelproduct.model_product_id,
-            sku: product.modelproduct.sku,
-            name: product.modelproduct.name,
-            description: product.modelproduct.description ?? "sin descripcion",
+            productId: product.ModelProduct.model_product_id,
+            sku: product.ModelProduct.sku,
+            name: product.ModelProduct.name,
+            description: product.ModelProduct.description ?? "sin descripcion",
             quantity: product.quantity,
             subtotal: product.total_price.toNumber()
         }));

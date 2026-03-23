@@ -884,7 +884,7 @@ function Warehouses() {
         phone: warehouse.phone,
         mail: warehouse.mail,
       });
-      router.push(`/editWarehouse?${params.toString()}`);
+      router.push(`warehouses/edit?${params.toString()}`);
     } else {
       alert("Warehouse not found");
     }

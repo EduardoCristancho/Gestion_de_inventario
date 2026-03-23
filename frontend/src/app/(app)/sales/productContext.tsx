@@ -9,7 +9,7 @@ export interface searchProduct {
   description: string;
   name: string;
   price: number;
-  quantity: number;
+  stock: number;
 }
 
 export interface cartProduct {
@@ -39,12 +39,13 @@ interface productContextType {
   setCartProducts: (products: cartProduct[]) => void;
   addProduct: (product: searchProduct) => void;
   modifyQuantity: (product: cartProduct, quantity: number) => void;
+  displayFindClient: boolean;
+  setDisplayFindClient: (display: boolean) => void;
   removeProduct: (variantId: number) => void;
   generalSellInfo: generalSellInfo;
   asignClient: (
     idClient: number,
     clientName: string,
-    clientLastName: string, 
     clientIdentification: number,
   ) => void;
 }
@@ -72,6 +73,8 @@ export const ProductsProvider = ({
 
   const [cartProducts, setCartProducts] = useState<cartProduct[]>([])
 
+  const [displayFindClient, setDisplayFindClient] = useState(false);
+
   const addProduct = (product: searchProduct) => {
 
     const productExists = cartProducts.some((cartProduct) => cartProduct.productId === product.productId);
@@ -90,7 +93,7 @@ export const ProductsProvider = ({
         name: product.name,
         description: product.description,
         price: product.price,
-        quantityMax: product.quantity,
+        quantityMax: product.stock,
         quantity: 1, 
         totalPrice: product.price,
       },
@@ -124,13 +127,12 @@ export const ProductsProvider = ({
   const asignClient = (
     idClient: number,
     clientName: string,
-    clientLastName: string, 
     clientIdentification: number,
   ) => {
     setGeneralSellInfo({
       ...generalSellInfo,
       idClient: idClient,
-      clientName: `${clientName} ${clientLastName}`,
+      clientName: `${clientName}`,
       clientIdentification: clientIdentification,
     });
   };
@@ -147,6 +149,8 @@ export const ProductsProvider = ({
         addProduct,
         modifyQuantity,
         removeProduct,
+        displayFindClient,
+        setDisplayFindClient,
         generalSellInfo,
         asignClient,
       }}

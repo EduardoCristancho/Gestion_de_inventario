@@ -1,9 +1,14 @@
 "use client";
 
 import { LuSearch } from "react-icons/lu";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useProducts } from "./productContext";
-
+import { LuNotebookTabs } from "react-icons/lu";
+import { CiBarcode } from "react-icons/ci";
+import Link from "next/link";
+import CodeScanner from "@/components/codeScanner";
+import { includes, string } from "zod";
+import { checkCameraAvailability } from "@/hooks/checkCamara";
 function SearchInput({
   setShowSearchContainer,
 }: {
@@ -11,126 +16,88 @@ function SearchInput({
 }) {
   const { searchProducts, setSearchProducts, setFilteredProducts } =
     useProducts();
+  const [showScan,setShowScan] = useState<boolean>(false)
+  const [code, setCode] = useState<string>("")
+  const [query, setQuery] = useState<string>("")
+  const [hasCamara, setHasCamara] = useState<boolean>(false)
+  
+  //verificamos que el dispositivo sea compatible con la opcion de scanear
+  useEffect(()=>{
+    const hasCamara = (async ()=>{
+      const isCamaraAvailable = await checkCameraAvailability();
+      if(isCamaraAvailable){
+        setHasCamara(true)
+      }else{
+        setHasCamara(false);
+      }
+    })
+
+    hasCamara();
+  },[])
+
 
   useEffect(() => {
-    /* async function fetchProducts() {
+    if (!query.trim() && !code.trim()) {
+      setFilteredProducts([]);
+      return
+    }
+
+  // 1. Establecemos el timer para el "Debounce"
+  const delayDebounceFn = setTimeout(async () => {
       try {
-        const response = await fetch("/api/getproducts");
+        const response = await fetch(`/api/inventory/models?modelName=${query}&sku=${code}`,
+          {
+            method: "GET",
+            credentials: "include"
+          }
+        );
+        //mostramos el contenedor despues de haber escaneado el codigo con la camara
+        if(showScan == false && code.trim() != ""){
+          setShowSearchContainer(true);
+        }
+
         const products = await response.json();
-        setSearchProducts(products);
+        //asignamos la data al state
+        setFilteredProducts(products.data.map((product: any)=>{ return {
+            sku: product.sku,
+            image: '/noimage',
+            productId: product.model_product_id,
+            description: product.description,
+            name: product.name,
+            price: parseInt(product.price),
+            stock: parseInt(product.stock)
+        } }));
       } catch (error) {
         console.error("Error al obtener los productos:", error);
         alert("Error al obtener los productos. Por favor, inténtelo de nuevo más tarde.");
       }
-    }
-    fetchProducts(); */
+  }, 400); // 400ms es el "sweet spot" entre velocidad y ahorro de recursos
 
-    const products = [
-      {
-        sku: 454884,
-        image: "/PC.png",
-        productId: 158,
-        name: "Laptop Lenovo IdeaPad 3",
-        description: "Laptop de alto rendimiento para gaming y edición",
-        price: 1500.75,
-        quantity: 69,
-      },
-      {
-        sku: 77885,
-        image: "/PC.png",
-        productId: 160,
-        name: "Laptop Lenovo IdeaPad 5",
-        description: "Laptop de alto rendimiento para gaming y edición",
-        price: 1900.75,
-        quantity: 80,
-      },
-      {
-        sku: 515118,
-        image: "/PC.png",
-        productId: 1689,
-        name: "Smartphone Samsung Galaxy A55",
-        description:
-          "Smartphone de serie A, RAM: 8GB, ROM: 128GB, Batería: 5000mA, Pantalla: 6.7 pulgadas, 120hz, Blanco",
-        price: 3500.96,
-        quantity: 135,
-      },
-      {
-        sku: 454511,
-        image: "/PC.png",
-        productId: 163,
-        name: "Smartphone Samsung Galaxy A20",
-        description:
-          "Smartphone de serie A, RAM: 3GB, ROM: 32GB, Batería: 4000mA, Pantalla: 6.1 pulgadas, 60hz, Amarillo",
-        price: 1200.96,
-        quantity: 50,
-      },
-      {
-        sku: 1459959,
-        image: "/PC.png",
-        productId: 16303,
-        name: "Smartphone Samsung Galaxy A10",
-        description:
-          "Smartphone de serie A, RAM: 2GB, ROM: 32GB, Batería: 3000mA, Pantalla: 5.1 pulgadas, 60hz, Rojo",
-        price: 500.01,
-        quantity: 5,
-      },
-      {
-        sku: 6554654,
-        image: "/PC.png",
-        productId: 1334,
-        name: "Smartphone Samsung Galaxy A54",
-        description:
-          "Smartphone de serie A, RAM: 6GB, ROM: 128GB, Batería: 5000mA, Pantalla: 6.5 pulgadas, 120hz, Morado",
-        price: 500.01,
-        quantity: 5,
-      },
-      {
-        sku: 7878454,
-        image: "/PC.png",
-        productId: 1479,
-        name: "Smartphone Samsung Galaxy A53",
-        description:
-          "Smartphone de serie A, RAM: 6GB, ROM: 128GB, Batería: 5000mA, Pantalla: 6.2 pulgadas, 120hz, Azul",
-        price: 500.01,
-        quantity: 5,
-      },
-      {
-        sku: 54544,
-        image: "/PC.png",
-        productId: 1478,
-        name: "Smartphone Samsung Galaxy S24 Ultra",
-        description:
-          "Smartphone de serie S, RAM: 12GB, ROM: 256GB, Batería: 5000mA, Pantalla: 6.9 pulgadas, 120hz, Morado",
-        price: 500.01,
-        quantity: 5,
-      },
-    ];
-    setSearchProducts(products);
-  }, []);
+  // 3. Limpiamos el timer si el usuario sigue escribiendo
+  return () => clearTimeout(delayDebounceFn);
+
+  }, [code, query]);
+
 
   return (
     <div className="relative flex justify-center items-center mt-2 gap-2 w-full">
-      <LuSearch className="absolute right-[6%] md:right-[12%] lg:right-[12%] xl:right-[16.5%]" />
+        {/*Notebook Icon */}
+        <Link href="/sales/salesRecords" className="absolute md:left-20 left-[2%] md:left-[10%] text-globalone">
+          <LuNotebookTabs className="size-10 hover:size-11 transition-all duration-[200ms]" />
+        </Link>
+        
+      <LuSearch className="absolute right-[18%] md:right-[12%] lg:right-[12%] xl:right-[16.5%]" />
       <input
-        className="bg-white text-2xl text-black font-bold w-95/100 md:w-9/10 xl:w-7/10 h-[50px] p-5 rounded-lg justify-center items-center shadow-xl hover:shadow-2xl hover:placeholder:text-black duration-500"
+        className="bg-white text-2xl text-black font-bold w-70/100 md:w-9/10 xl:w-7/10 h-[50px] p-5 rounded-lg justify-center items-center shadow-xl hover:shadow-2xl hover:placeholder:text-black duration-500"
         type="text"
         id="searchInput"
         placeholder="Buscar producto"
+        value={query}
         onClick={() => setShowSearchContainer(true)}
         onChange={(e) => {
           const searchValue = e.target.value.toLowerCase();
-          if (searchValue === "") {
-            setFilteredProducts([]);
-            return;
-          }
-
-          const filteredProducts = searchProducts.filter(
-            (product) =>
-              product.name.toLowerCase().includes(searchValue) ||
-              product.sku.toString().includes(searchValue)
-          );
-
-          setFilteredProducts(filteredProducts);
+          setQuery(searchValue);
+          
         }}
         onBlur={(e) => {
           e.target.value = "";
@@ -147,7 +114,18 @@ function SearchInput({
           setShowSearchContainer(false);
         }}
       />
+
+      {/**Barcode Icon*/}
+      {hasCamara && (
+        <button className="absolute text-globalone right-[2%] md:right-[10%]" onClick={()=>{setShowScan(true)}} >
+          <CiBarcode className="size-10" />
+        </ button>
+      )}
+      {showScan && hasCamara && (
+        <CodeScanner setValue={setCode} setClosed={setShowScan}/>
+      )}
     </div>
+    
   );
 }
 

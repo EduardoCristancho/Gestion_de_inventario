@@ -38,13 +38,13 @@ export class employeRepository implements IEmployeRepository {
                     visibility: true
                 },
                 include: {
-                    role: {
+                    Role: {
                         select: {
                             role_id: true,
                             name: true
                         }
                     },
-                    warehouse: {
+                    Warehouse: {
                         select: {
                             warehouse_id: true,
                             name: true
@@ -87,13 +87,13 @@ export class employeRepository implements IEmployeRepository {
             return await this.prisma.user.findFirst({
                 where: whereCondition,
                 include: {
-                    role: {
+                    Role: {
                         select: {
                             role_id: true,
                             name: true
                         }
                     },
-                    warehouse: {
+                    Warehouse: {
                         select: {
                             warehouse_id: true,
                             name: true

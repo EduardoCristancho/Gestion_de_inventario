@@ -3,7 +3,7 @@ import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { paginationQueryDto } from './dto/pagination.dto';
-import { User } from '../userDecorator';
+import { User } from '../auth/userDecorator';
 
 @Controller('clients')
 export class ClientsController {

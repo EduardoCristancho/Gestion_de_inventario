@@ -5,6 +5,7 @@ export interface User {
     username: string,
     companyId: number,
     rol: number
+    warehouseId: number
 }
 export const User = createParamDecorator(
     (data: unknown, ctx : ExecutionContext)=>{

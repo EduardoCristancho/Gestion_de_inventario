@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, InternalServerErrorException, NotFoundException, Put } from '@nestjs/common';
 import { WareHouseService } from './ware-house.service';
 import { CreateWareHouseDto } from './dto/create-ware-house.dto';
-import { User } from '../userDecorator';
+import { User } from '../auth/userDecorator';
 
 
 @Controller('ware-house')

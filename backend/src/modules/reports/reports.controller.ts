@@ -6,7 +6,7 @@ import { MostSelledDto, MostSelledTroughTimeDto } from './dto/most-selled..dto';
 import { lowStockDto } from './dto/lowStock.dto';
 import { Roles } from '../auth/authorizationUtils/authorizationDecorator';
 import { permittedRoles } from '../auth/authorizationUtils/permittedRoles';
-import { User } from '../userDecorator';
+import { User } from '../auth/userDecorator';
 
 
 @Controller('reports')

@@ -67,7 +67,7 @@ export class ProductEntity{
     description: string | null;
     cost: Decimal | null;
     price: Decimal;
-    stock: 
+    Stock: 
     {
       stock_id: number;
       model_product_id: number;
@@ -104,18 +104,18 @@ export class SaleEntityUnique {
     sale_id: number;
     date: Date;
     total_amount: Decimal;   
-    user: {
+    User: {
         user_id: number;
         username: string;
     };
-    customer: {
+    Customer: {
         customer_id: number;
         id_card: string | null;
         first_name: string;
         last_name: string | null;
         phone: string | null;
      }| null;
-    sale_payments: {
+    SalePayment: {
         sale_payment_id: number;
         payment_coin_id: number;
         exchange_rate: Decimal | null;
@@ -132,11 +132,11 @@ export class SaleEntityUnique {
             };
         }
     }[];
-    product_list: {
+    ProductList: {
         product_list_id: number,
         quantity: number,
         total_price: Decimal,
-        modelproduct: {
+        ModelProduct: {
             model_product_id: number,
             sku: string,
             name: string,

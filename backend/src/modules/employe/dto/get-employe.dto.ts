@@ -12,9 +12,9 @@ export class GetEmployeDto {
     parseToGetEmployeDto(employe: getEmploye): GetEmployeDto {
         this.id = employe.user_id;
         this.userName = employe.username;
-        this.rol = employe.role.name;
+        this.rol = employe.Role.name;
         this.password = employe.password;
-        this.warehouse = employe.warehouse.name;
+        this.warehouse = employe.Warehouse.name;
         return this;
     }
 }
@@ -22,8 +22,8 @@ export class GetAllEmployeDto extends OmitType(GetEmployeDto, ['password']) {
     parseToGetAllEmployeDto(employe: getEmploye): GetAllEmployeDto {
         this.id = employe.user_id;
         this.userName = employe.username;
-        this.rol = employe.role.name;
-        this.warehouse = employe.warehouse.name;
+        this.rol = employe.Role.name;
+        this.warehouse = employe.Warehouse.name;
         return this;
     }
     

@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ValidationPip
 import { SupplierService } from './supplier.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
-import { User } from '../userDecorator';
+import { User } from '../auth/userDecorator';
 import { paginationQueryDto, PaginationResponse } from '../clients/dto/pagination.dto';
 import { GetSupplierCompleteDto, GetSupplierDto } from './dto/get-supplier.dto';
 

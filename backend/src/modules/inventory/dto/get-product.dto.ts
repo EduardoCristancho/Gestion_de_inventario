@@ -20,3 +20,25 @@ export class ProductResponseDto {
     }
 }
 
+export class GetProductDto {
+    model_product_id: number;
+    name: string;
+    sku: number;
+    description: string;
+    cost: number;
+    price: number;
+    stock: number;
+    
+    static parseToGetProductDto(product: any): GetProductDto {
+        const productDto = new GetProductDto();
+        productDto.model_product_id = product.model_product_id;
+        productDto.name = product.name;
+        productDto.sku = product.sku;
+        productDto.description = product.description;
+        productDto.cost = product.cost;
+        productDto.price = product.price;
+        productDto.stock = parseInt(product.stock.toString());
+        return productDto;
+    }
+}
+

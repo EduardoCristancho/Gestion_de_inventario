@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen md:pb-0 md:pl-50 pb-16 pt-14 bg-primary">
+    <div className="h-[100dvh] flex flex-col md:pb-0 md:pl-50 pb-16 pt-14 bg-primary">
       <Header />
        {children}
       <BottomNavBar />

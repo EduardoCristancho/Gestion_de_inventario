@@ -1,6 +1,6 @@
 "use client";
 
-import { pwSeller } from "@/app/(app)/editSeller/page";
+import { pwSeller } from "@/app/(app)/sellers/edit/page";
 import { useEffect, useState } from "react";
 
 interface warehouse {

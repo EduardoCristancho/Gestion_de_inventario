@@ -1,7 +1,7 @@
 "use client"
 
-import { client } from "../clients/page";
-import RecordOrEditClient from "../../../components/recordOrEditClient";
+import { client } from "../page";
+import RecordOrEditClient from "../../../../components/recordOrEditClient";
 import { useSearchParams } from "next/navigation";
 
 function editClient(client: client) {

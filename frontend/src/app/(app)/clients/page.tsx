@@ -994,7 +994,7 @@ function Clients() {
         phone: client.phone,
         email: client.email,
       });
-      router.push(`/editClient?${params.toString()}`);
+      router.push(`clients/edit?${params.toString()}`);
     } else {
       alert("Client not found");
     }

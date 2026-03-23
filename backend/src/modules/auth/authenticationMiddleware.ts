@@ -28,7 +28,8 @@ export class authenticationMiddleware implements NestMiddleware {
                 id: user.id,
                 username: user.username,
                 companyId: user.companyId,
-                rol: user.rol
+                rol: user.rol,
+                warehouseId: user.warehouseId
             };
             
 

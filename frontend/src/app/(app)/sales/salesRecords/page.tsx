@@ -11,6 +11,7 @@ import { SalesModal } from '@/components/sale/SalesModal';
 import { redirect } from 'next/navigation';
 import { NotFoundError, unhandledError, handleError } from '@/utils/errorClasess';
 import { DeleteModal } from '@/components/deleteModal';
+import Loading from './loading';
 
 interface Sale {
   id: number;
