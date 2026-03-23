@@ -8,7 +8,7 @@ export async  function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
   try{
-    const response = await fetch('http://192.168.50.56:3001/auth/authToken',
+    const response = await fetch(`${process.env.NEXT_PUBLIC_HOST_URL}:3001/auth/authToken`,
       {
         body: JSON.stringify({
           token: token.value

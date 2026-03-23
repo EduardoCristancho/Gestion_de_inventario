@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   
-  allowedDevOrigins :['https://192.168.50.56:3000','192.168.50.56'],
+  allowedDevOrigins :[`${process.env.NEXT_PUBLIC_HOST_URL}:3000`, `${process.env.IP_ADDRESS}`],
   images: {
     remotePatterns: [
       {
@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://192.168.50.56:3001/:path*',
+        destination: `${process.env.NEXT_PUBLIC_HOST_URL}:3001/:path*`,
       },
     ]
   },
