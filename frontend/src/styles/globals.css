@@ -2,7 +2,9 @@
 
 @layer base {
   /* Definir variables CSS personalizadas */
-  [data-theme='oscuro'] {
+  [data-theme='oscuro'], 
+:root[data-theme='oscuro'],
+body[data-theme='oscuro']{
     --color-primary: #1A1A1A;
     --color-secondary: #29D3F1;
     --color-secondaryhover: #1bbcd8;
@@ -24,7 +26,9 @@
     --color-salesIcon: #E0E1FC;
   }
 
-  [data-theme='claro'] {
+  [data-theme='claro'], 
+:root[data-theme='claro'],
+body[data-theme='claro']{
     --color-primary: white;
     --color-secondary: #29D3F1;
     --color-tertiary: #F1F1F1;

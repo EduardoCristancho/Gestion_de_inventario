@@ -8,12 +8,17 @@ import SelectImageModal from "./SelectImageModal";
 import { AiFillPicture } from "react-icons/ai";
 import { AiTwotonePicture } from "react-icons/ai";
 import { showToast } from "nextjs-toast-notify";
+import SearchableSelect from "@/components/reports/SearchableSelect";
 
 interface ProductModel {
   id: string;
   name: string;
   sku: string;
   quantity: number;
+  supplier: {id: number, name:string}
+  cost: number;
+  price: number;
+  description: string;
   image: string | null;
 }
 
@@ -22,12 +27,18 @@ export default function CreateProduct() {
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
 
+
   // Estados para el modelo actual
   const [modelName, setModelName] = useState("");
   const [modelSku, setModelSku] = useState("");
   const [modelQuantity, setModelQuantity] = useState("");
+  const [modelCost, setModelCost] = useState("");
+  const [modelPrice, setModelPrice] = useState("");
+  const [modelDescription, setModelDescription] = useState("");
   const [modelImage, setModelImage] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [ProviderId , SetProviderId] = useState<number>(0)
+  const [ProviderName, setProviderName] = useState<string>("")
   // Lista de modelos agregados
   const [models, setModels] = useState<ProductModel[]>([]);
   
@@ -35,8 +46,10 @@ export default function CreateProduct() {
   const [hasCamara, setHasCamara] = useState<boolean>(false)
   const [renderScan, setRenderScan] = useState<boolean>(false)
   const [showSelectImage, setShowSelectImage] = useState<boolean>(false)
+  const [resetKey, setResetKey] = useState(0);
   const cameraRef = useRef<HTMLInputElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+
   const handleCloseSelectImage = ()=>{
     setShowSelectImage(false)
   }
@@ -83,10 +96,15 @@ export default function CreateProduct() {
 
   },[])
 
+
+
   // Agregar modelo a la lista
   const handleAddModel = () => {
-    if (!modelName || !modelSku || !modelQuantity) {
-      alert("Por favor completa todos los campos del modelo");
+    if (!modelName || !modelSku || !modelQuantity || !modelCost || !modelPrice || ProviderId == 0) {
+      showToast.warning("Por favor complete todos los campos del modelo", {
+        position: "top-center",
+        duration: 5000
+      })
       return;
     }
 
@@ -94,7 +112,14 @@ export default function CreateProduct() {
       id: Date.now().toString(),
       name: modelName,
       sku: modelSku,
+      supplier: {
+        id: ProviderId,
+        name: ProviderName
+      },
       quantity: parseInt(modelQuantity),
+      cost: parseFloat(modelCost),
+      price: parseFloat(modelPrice),
+      description: modelDescription,
       image: modelImage,
     };
 
@@ -107,6 +132,11 @@ export default function CreateProduct() {
     setModelName("");
     setModelSku("");
     setModelQuantity("");
+    setModelCost("");
+    setModelPrice("");
+    setModelDescription("");
+    SetProviderId(0);
+    setResetKey(prev=>prev + 1);//destruimos el select para resetear sus estados internos
     setModelImage(null);
     setImagePreview(null);
   };
@@ -125,15 +155,94 @@ export default function CreateProduct() {
   };
 
   // Guardar producto
-  const handleSave = () => {
+  const handleSave = async () => {
+   
+    //validamos los campos
     if (!productName || models.length === 0) {
-      alert("Debes agregar al menos un modelo al producto");
+      showToast.warning("Por favor Agregue al menos un modelo y relleno todos los campos del producto",{
+        position:"top-center",
+        duration: 5000
+      })
       return;
     }
-    console.log("Guardando producto:", { productName, productDescription, models });
-    // Aquí iría la lógica para guardar
+
+    try {
+      // Crear FormData
+      const formData = new FormData();
+      
+      // Agregar datos generales del producto
+      formData.append('name', productName);
+      formData.append('description', productDescription || '');
+
+      // Agregar cada modelo con su índice
+      for (let i = 0; i < models.length; i++) {
+        const model = models[i];
+        
+        formData.append(`models[${i}][name]`, model.name);
+        formData.append(`models[${i}][sku]`, model.sku);
+        formData.append(`models[${i}][quantity]`, model.quantity.toString());
+        formData.append(`models[${i}][supplierId]`, model.supplier.id.toString());
+        formData.append(`models[${i}][cost]`, model.cost.toString());
+        formData.append(`models[${i}][price]`, model.price.toString());
+        formData.append(`models[${i}][description]`, model.description || '');
+        
+        // Si hay imagen, convertirla a File y agregarla
+        if (model.image) {
+          try {
+            const response = await fetch(model.image);
+            const blob = await response.blob();
+            const file = new File([blob], `model_${i}_${Date.now()}.jpg`, { type: 'image/jpeg' });
+            formData.append(`models[${i}][photo]`, file);
+          } catch (error) {
+            console.error(`Error al procesar imagen del modelo ${i}:`, error);
+            // Continuar sin la imagen si hay error
+          }
+        }
+      }
+
+      // Mostrar loading
+      showToast.info("Guardando producto...", {
+        position: "top-center",
+        duration: 2000
+      });
+
+      // Realizar el fetch
+      const response = await fetch('/api/inventory', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+
+      // Manejar respuesta
+      if (response.ok) {
+        showToast.success("Producto guardado exitosamente", {
+          position: "top-center",
+          duration: 5000
+        });
+        
+        // Limpiar formulario después de guardar exitosamente
+        handleClearAll();
+      } else {
+        // Manejar errores del servidor
+        const errorMessage = data.message || data.error || "Error al guardar el producto";
+        showToast.error(errorMessage, {
+          position: "top-center",
+          duration: 5000
+        });
+      }
+    } catch (error: any) {
+      // Manejar errores de red o del fetch
+      console.error("Error al guardar producto:", error);
+      showToast.error("Error de conexión. Por favor intenta nuevamente.", {
+        position: "top-center",
+        duration: 5000
+      });
+    }
   };
 
+ 
   return (
     <div className="h-full overflow-y-auto px-3 md:px-6 py-4 pb-5">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -187,6 +296,7 @@ export default function CreateProduct() {
                     className="w-full bg-white/10 text-white px-4 py-3 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--color-info)] focus:border-transparent transition-all resize-none"
                   />
                 </div>
+
               </div>
             </div>
 
@@ -251,6 +361,20 @@ export default function CreateProduct() {
                   />
                 </div>
 
+                {/* Descripción del Modelo */}
+                <div>
+                  <label className="block text-white/70 text-sm font-medium mb-2">
+                    Descripción
+                  </label>
+                  <textarea
+                    value={modelDescription}
+                    onChange={(e) => setModelDescription(e.target.value)}
+                    placeholder="Describe las características específicas de este modelo..."
+                    rows={2}
+                    className="w-full bg-white/10 text-white px-4 py-2.5 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--color-success)] text-sm resize-none"
+                  />
+                </div>
+
                 {/* SKU y Cantidad */}
                 <div className="grid grid-cols-1 gap-3">
                   <div>
@@ -279,6 +403,11 @@ export default function CreateProduct() {
                       )}
                     </div>
                   </div>
+
+                  <div className="text-globalone">
+                    <label htmlFor="">Proveedor</label>
+                    <SearchableSelect key={resetKey} setId={SetProviderId} url="/api/supplier" multipleSelection={false} Setname={setProviderName}/> 
+                  </div>
                   
                   <div>
                     <label className="block text-white/70 text-sm font-medium mb-2">
@@ -290,6 +419,38 @@ export default function CreateProduct() {
                         value={modelQuantity}
                         onChange={(e) => setModelQuantity(e.target.value)}
                         placeholder="0"
+                        min="0"
+                        className="w-full bg-white/10 text-white px-4 py-2.5 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--color-success)] text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Costo y Precio */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-white/70 text-sm font-medium mb-2">
+                        Costo *
+                      </label>
+                      <input
+                        type="number"
+                        value={modelCost}
+                        onChange={(e) => setModelCost(e.target.value)}
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0"
+                        className="w-full bg-white/10 text-white px-4 py-2.5 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--color-success)] text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-white/70 text-sm font-medium mb-2">
+                        Precio *
+                      </label>
+                      <input
+                        type="number"
+                        value={modelPrice}
+                        onChange={(e) => setModelPrice(e.target.value)}
+                        placeholder="0.00"
+                        step="0.01"
                         min="0"
                         className="w-full bg-white/10 text-white px-4 py-2.5 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--color-success)] text-sm"
                       />
@@ -382,11 +543,17 @@ export default function CreateProduct() {
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <h3 className="text-white font-medium text-sm truncate">{model.name}</h3>
-                        <div className="flex items-center gap-3 mt-1">
+                        <h4 className="text-white/60  text-sm truncate">Proveedor: {model.supplier.name}</h4>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
                           <span className="text-white/60 text-xs">SKU: {model.sku}</span>
                           <span className="text-[var(--color-success)] text-xs font-medium bg-[var(--color-success)]/10 px-2 py-0.5 rounded">
                             Stock: {model.quantity}
                           </span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-white/50 text-xs">Costo: ${model.cost.toFixed(2)}</span>
+                          <span className="text-white/50 text-xs">•</span>
+                          <span className="text-[var(--color-info)] text-xs font-medium">Precio: ${model.price.toFixed(2)}</span>
                         </div>
                       </div>
 
@@ -438,7 +605,7 @@ export default function CreateProduct() {
       {/* Renderizado condicional del desplegable para seleccionar la imagen */}
 
       {showSelectImage && (
-        <SelectImageModal isOpen={showSelectImage} onClose={handleCloseSelectImage} onSelectFromGallery={handleImageSelection} onTakePhoto={handleTakePhoto}/>
+        <SelectImageModal isOpen={showSelectImage} onClose={handleCloseSelectImage} onSelectFromGallery={handleImageSelection} onTakePhoto={handleTakePhoto} hasCamara={hasCamara}/>
       )}
     </div>
   );

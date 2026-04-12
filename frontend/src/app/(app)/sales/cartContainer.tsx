@@ -274,7 +274,7 @@ function CartContainer({
         </div>
 
         {/* Footer Actions - Mobile: Compact bar with icons */}
-        <div className="md:hidden absolute bottom-0 left-0 right-0 bg-tertiary/95 backdrop-blur-md border-t border-white/10 px-4 py-2.5 flex items-center justify-between z-30 ">
+        <div className="md:hidden absolute bottom-0 left-0 right-0 bg-quaternary backdrop-blur-md border-t border-white/10 px-4 py-2.5 flex items-center justify-between z-30 ">
           {/* Vaciar button - Icon only */}
           <button
             className="flex items-center justify-center w-12 h-12 bg-[var(--color-danger)]/20 hover:bg-[var(--color-danger)]/30 rounded-xl transition-colors"

@@ -6,22 +6,44 @@ import { IAuth } from './IAuth';
 import { employeRepository } from '../employe/employeRepository';
 import { JwtService } from '@nestjs/jwt';
 import { error } from 'console';
+import { CreateCompanyDto } from '../company/dto/create-company.dto';
+import * as bcrypt from 'bcrypt';
+import { StorageService } from '../inventory/storageService';
 
 @Injectable()
 export class AuthService {
   constructor(@Inject('IAuth') private readonly authRepository: IAuth,
     @Inject('IEmployeRepository') private readonly employeRepository: employeRepository,
-    @Inject(JwtService) private jwtService: JwtService
+    @Inject(JwtService) private jwtService: JwtService,
+    private readonly storageService : StorageService
   ) {}
+
+
+  async signUp(createCompanyDto: CreateCompanyDto, file?: Express.Multer.File) {
+      //encriptamos las credenciales
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(createCompanyDto.Password, saltRounds);
+      createCompanyDto.Password = hashedPassword;
+      
+      //guardamos la imagen y seteamos la url a guardar
+      if(file != null){
+        createCompanyDto.Image = await this.storageService.savePhoto(file)
+      }
+      const result = await this.authRepository.signUp(createCompanyDto);
+      //devolvemos el dto de entrada con el id.
+      createCompanyDto.id = result.company.company_id
+      return createCompanyDto;
+    }
+    
   async login(credentials: credentialsDTO){
     const user: any = await this.employeRepository.findOne(undefined,credentials.username);
     if(!user){
       throw new BadRequestException('Invalid Credentials');
     }
-    const passwordMatch = user.password === credentials.password;
+    const passwordMatch = await bcrypt.compare(credentials.password, user.password);
     
     if(!passwordMatch){
-      throw new BadRequestException('Invalid credentials');
+      return null;
     }
 
     //GENERAMOS TOKEN

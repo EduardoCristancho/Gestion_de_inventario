@@ -20,6 +20,11 @@ export default async function RootLayout({
   const user = userHeader ? JSON.parse(userHeader) : null;
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {process.env.NODE_ENV === 'development' && (
+          <script src="http://192.168.50.56:8097" />
+        )}
+      </head>
       <body>
         <ThemeProvider>
           <AuthProvider initialUser={user}>

@@ -11,6 +11,7 @@ export default function Header() {
   
   return (
     <header className="fixed top-0 left-0 z-50 w-full h-14 bg-tertiary/95 backdrop-blur-md border-b border-white/10 shadow-lg flex items-center px-4 md:px-6">
+      
       <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
         
         {/* Logo and Brand */}

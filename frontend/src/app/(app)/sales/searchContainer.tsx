@@ -12,7 +12,7 @@ function SearchContainer({showSearchContainer, setShowSearchContainer}: {showSea
     return (
       <div
         id="searchContainer"
-        className={`absolute flex flex-col w-95/100 md:w-9/10 xl:w-7/10 top-[60px] md:top-[62px] bg-tertiary/95 backdrop-blur-md rounded-xl shadow-xl border border-white/10 transition-all duration-300 z-20 overflow-hidden ${
+        className={`absolute flex flex-col w-95/100 md:w-9/10 xl:w-7/10 top-[60px] md:top-[62px] bg-quaternary backdrop-blur-md rounded-xl shadow-xl border border-white/10 transition-all duration-300 z-20 overflow-hidden ${
           showSearchContainer ? "max-h-[200px] py-8" : "max-h-0 py-0"
         }`}
       >
@@ -27,7 +27,7 @@ function SearchContainer({showSearchContainer, setShowSearchContainer}: {showSea
   return (
     <div
       id="searchContainer"
-      className={`absolute flex flex-col w-95/100 md:w-9/10 xl:w-7/10 top-[60px] md:top-[62px] bg-tertiary/95 backdrop-blur-md rounded-xl shadow-xl border border-white/10 transition-all duration-300 z-20 overflow-hidden ${
+      className={`absolute flex flex-col w-95/100 md:w-9/10 xl:w-7/10 top-[60px] md:top-[62px] bg-quaternary  rounded-xl shadow-xl border border-white/10 transition-all duration-300 z-20 overflow-hidden ${
         showSearchContainer ? "max-h-[65vh] sm:max-h-[70vh]" : "max-h-0"
       }`}
     >

@@ -101,24 +101,14 @@ export default function Settings() {
       try {
         const info = await fetchEnterpriseInfo();
         setEnterpriseInfo(info);
-      } catch (error) {
+        setLogoPreview(info.company_logo)
+        } catch (error) {
         console.error("Error fetching enterprise info:", error);
       }
+        
     };
     loadEnterpriseInfo();
-    
-    const loadLogo = async () => {
-      try {
-        const response = await fetch("/api/enterprise/logo");
-        if (!response.ok) throw new Error("Failed to fetch logo");
-        const blob = await response.blob();
-        const objectUrl = URL.createObjectURL(blob);
-        setLogoPreview(objectUrl);
-      } catch (error) {
-        console.error("Error fetching logo:", error);
-      }
-    };
-    loadLogo();
+
     */
   }, []);
 

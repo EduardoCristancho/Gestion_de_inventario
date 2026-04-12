@@ -3,10 +3,44 @@ import { CreateInventoryDto, getUnifiedParams } from './dto/create-inventory.dto
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { InventoryRepository } from './inventory.repository';
 import { paginationQueryDto } from '../clients/dto/pagination.dto';
-
+import { StorageService } from './storageService';
 @Injectable()
 export class InventoryService {
-  constructor(private readonly inventoryRepository: InventoryRepository){}
+  constructor(
+    private readonly inventoryRepository: InventoryRepository,
+    private readonly storageService: StorageService
+  ){}
+
+  async create(createInventoryDto : CreateInventoryDto, warehouseId: number, company_id : number, photos: Express.Multer.File[]){
+    //Asociacion de fotos a los modelos entrantes.
+    for (const photo of photos) {
+      // Extraemos el índice usando una Expresión Regular para un codificacion
+      //similar a esta model[1][photo]
+      const match = photo.fieldname.match(/models\[(\d+)\]/);
+      
+      if (match) {
+        const index = parseInt(match[1], 10);
+
+        // 2. Verificamos que el modelo realmente exista en el DTO
+        if (createInventoryDto.models[index]) {
+          // Guardamos físicamente el archivo
+          const urlImage = await this.storageService.savePhoto(photo);
+          
+          // Asignamos la URL al modelo correspondiente
+          createInventoryDto.models[index].imgUrl = urlImage;
+        }
+      }
+    }
+    
+    //guardamos los productos en bd
+
+    const product = await this.inventoryRepository.saveProduct(createInventoryDto, warehouseId, company_id);
+
+    createInventoryDto.productId = product.product_id;
+
+    return createInventoryDto;
+  
+  }
 
   async findAll(company_id: number) {
     const result = await this.inventoryRepository.findAll(company_id);

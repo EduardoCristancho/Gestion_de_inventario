@@ -7,6 +7,7 @@ interface SelectImageModalProps {
   onClose: () => void;
   onSelectFromGallery: () => void;
   onTakePhoto: () => void;
+  hasCamara: boolean;
 }
 
 export default function SelectImageModal({
@@ -14,6 +15,7 @@ export default function SelectImageModal({
   onClose,
   onSelectFromGallery,
   onTakePhoto,
+  hasCamara,
 }: SelectImageModalProps) {
   if (!isOpen) return null;
 
@@ -56,8 +58,8 @@ export default function SelectImageModal({
                 <p className="text-white/60 text-sm">Seleccionar desde el almacenamiento</p>
               </div>
             </button>
-
-            {/* Cámara */}
+          {/* Cámara */}
+          { hasCamara && (
             <button
               onClick={onTakePhoto}
               className="w-full flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all group hover:cursor-pointer"
@@ -70,6 +72,8 @@ export default function SelectImageModal({
                 <p className="text-white/60 text-sm">Tomar una foto ahora</p>
               </div>
             </button>
+            )
+          }
           </div>
         </div>
       </div>

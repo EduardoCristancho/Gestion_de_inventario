@@ -1,19 +1,41 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, Res, Req, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, Res, Req, BadRequestException, UnauthorizedException, UseInterceptors, UploadedFile, ParseFilePipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { companyDTO } from './dto/companyDTO';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { credentialsDTO } from './dto/credentialsDTO';
 import { Request, Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CompanyDto, CreateCompanyDto } from '../company/dto/create-company.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Post('/signup')
+  @UseInterceptors(FileInterceptor('Photo'))
+    async create( @Body(new ValidationPipe({transform: true}))  createCompanyDto: CreateCompanyDto, @UploadedFile(new ParseFilePipe({fileIsRequired:false})) file? : Express.Multer.File) {
+      const company = await this.authService.signUp(createCompanyDto, file);
+      return CompanyDto.parseFromCreate(company);
+    }
+
   @Post('/login')
   async login(@Body(new ValidationPipe({transform: true})) credentials: credentialsDTO,  @Res({passthrough: true}) res: Response) {
      const token = await this.authService.login(credentials);
-      res.cookie('token', token, {httpOnly: true, maxAge: 24 * 60 * 60 * 1000});
-      return res.redirect('/dashboard');
+
+  if (!token) {
+    // Si no hay token, lanzamos el error para que el Front capte el catch
+    throw new UnauthorizedException('Credenciales incorrectas');
+  } 
+
+  // Establecemos la cookie. El navegador la guardará al recibir el 200 OK
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax', // Importante para que se envíe en navegaciones de Next.js
+    maxAge: 24 * 60 * 60 * 1000
+  });
+
+  // Devolvemos un JSON. Esto permite que el Front no se recargue
+  return { success: true };
     
   }
 

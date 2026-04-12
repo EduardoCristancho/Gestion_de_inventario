@@ -25,6 +25,7 @@ export class GetProductDto {
     name: string;
     sku: number;
     description: string;
+    img: string;
     cost: number;
     price: number;
     stock: number;
@@ -38,6 +39,7 @@ export class GetProductDto {
         productDto.cost = product.cost;
         productDto.price = product.price;
         productDto.stock = parseInt(product.stock.toString());
+        productDto.img = product.photo;
         return productDto;
     }
 }

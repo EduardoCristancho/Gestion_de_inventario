@@ -1,11 +1,49 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { paginationQueryDto } from "../clients/dto/pagination.dto";
-import { getUnifiedParams } from "./dto/create-inventory.dto";
+import { CreateInventoryDto, getUnifiedParams } from "./dto/create-inventory.dto";
+import { Supplier } from "../supplier/entities/supplier.entity";
+import { monitorEventLoopDelay } from "perf_hooks";
 
 @Injectable()
 export class InventoryRepository {
   constructor(private readonly prisma: PrismaService){}
+
+
+  async saveProduct(createInventory: CreateInventoryDto, warehouse_id : number, company_id : number){
+    const result = await this.prisma.product.create({
+      data:{
+        name: createInventory.name,
+        description: createInventory.description,
+        visibility: true,
+        company_id: company_id,
+        ModelProduct: {
+          create : createInventory.models.map(model=>({
+            name: model.name,
+            sku: model.sku,
+            description: model.description,
+            photo: model.imgUrl,
+            cost: model.cost,
+            price: model.price,
+            supplier_id: model.supplierId,
+            Stock:{
+              create: {
+                quantity: model.quantity,
+                warehouse_id: warehouse_id,
+                stock_movement_id: 1
+              }
+            }
+          }))
+        }
+      },
+      include: {
+        ModelProduct: true
+      }
+    })
+
+    return result;
+  }
+
 
   async findAll(company_id: number){
     return await this.prisma.product.findMany({
@@ -161,6 +199,7 @@ export class InventoryRepository {
         mp.description,
         mp.cost,
         mp.price,
+        mp.photo,
         sum(s.quantity) as stock
       from "Product" as p
       inner join "ModelProduct" as mp on p.product_id = mp.product_id
@@ -226,4 +265,6 @@ export class InventoryRepository {
       console.log(e);
     }
   }
+
+  
 }

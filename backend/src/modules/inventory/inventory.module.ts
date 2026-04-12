@@ -3,10 +3,11 @@ import { InventoryService } from './inventory.service';
 import { InventoryController } from './inventory.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { InventoryRepository } from './inventory.repository';
+import { StorageService } from './storageService';
 
 @Module({
   imports: [PrismaModule],
   controllers: [InventoryController],
-  providers: [InventoryService, InventoryRepository],
+  providers: [InventoryService, InventoryRepository, StorageService],
 })
 export class InventoryModule {}

@@ -5,7 +5,8 @@ import { authRepository } from './auth.repository';
 import { PrismaModule } from '../prisma/prisma.module';
 import { EmployeModule } from '../employe/employe.module';
 import { JwtModule } from '@nestjs/jwt';
-import { authenticationMiddleware } from './authenticationMiddleware';
+import { StorageService } from '../inventory/storageService';
+
 
 @Module({
   imports: [PrismaModule, EmployeModule, 
@@ -16,7 +17,7 @@ import { authenticationMiddleware } from './authenticationMiddleware';
     })
   ],
   controllers: [AuthController],
-  providers: [AuthService, {provide: 'IAuth', useClass: authRepository}],
+  providers: [AuthService, {provide: 'IAuth', useClass: authRepository}, StorageService],
   exports: [AuthService]
 })
 export class AuthModule {}

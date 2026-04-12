@@ -13,6 +13,8 @@ import { SupplierModule } from './modules/supplier/supplier.module';
 import { authenticationMiddleware } from './modules/auth/authenticationMiddleware';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { AuthorizationGuard } from './modules/auth/authorizationUtils/authorizationGuard';
+import { CompanyModule } from './modules/company/company.module';
+
 
 
 @Module({
@@ -29,7 +31,8 @@ import { AuthorizationGuard } from './modules/auth/authorizationUtils/authorizat
     WareHouseModule,
     ReportsModule,
     SupplierModule,
-    PrismaModule
+    PrismaModule,
+    CompanyModule,
   ],
   controllers: [],
   providers: [{provide: 'APP_GUARD', useClass: AuthorizationGuard}],

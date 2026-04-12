@@ -1,39 +1,39 @@
 "use client";
-import {useState, useContext} from "react";
+import {useState, useContext, use, useEffect} from "react";
 import { Building, Lock, ArrowRight, User } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { AuthContext } from "@/hooks/authContext";
+import { IoMdEye, IoMdEyeOff } from "react-icons/io";
+import { showToast } from "nextjs-toast-notify";
 
 export default function Login() {
   const router = useRouter();
   const [failedLogin, setFailedLogin] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
-  // async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
-  //   e.preventDefault();
-  //   try {
-  //    const response = await fetch ("/api/auth/login", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //       username: e.currentTarget.username.value,
-  //       password: e.currentTarget.password.value,
-  //     })
-  //    }) 
-  //    if(!response.ok){
-  //       setFailedLogin(true);
-  //       setTimeout(() => {
-  //         setFailedLogin(false);
-  //       }, 3000);
-  //       return;
-  //     }
-  //     return ;
-      
-  //   }catch (error) {
-  //     console.log(error);
-  //   }
-  // }
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    try {
+     const response = await fetch ("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: e.currentTarget.username.value,
+        password: e.currentTarget.password.value,
+      })
+     }) 
+     if(!response.ok){
+        const exception : any = await response.json();
+        showToast.error(exception.message , {duration: 5000, position: "top-center"})
+      }
+      window.location.href = '/dashboard';
+    }catch (error) {
+      showToast.error("Ocurrio un fallo en la autenticacion", {duration: 5000, position:"top-center"})
+    }
+  }
+
   return (
     <div className="bg-[#586C8C] min-h-screen flex items-center justify-center font-sans ">
       {/* Contenedor principal para el diseño de escritorio */}
@@ -90,7 +90,7 @@ export default function Login() {
               <h1 className="text-4xl font-bold text-white lg:text-gray-800 mt-2">Login</h1>
             </div>
 
-            <form className="space-y-4" action={"/api/auth/login"} method="POST" >
+            <form className="space-y-4" onSubmit={handleLogin}>
               {/* Input RIF/Usuario */}
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -105,16 +105,25 @@ export default function Login() {
               </div>
 
               {/* Input Contraseña */}
-              <div className="relative">
+              <div className="relative flex flex-row gap-2">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                   <Lock className="h-5 w-5 text-gray-400" />
                 </span>
                 <input
-                  type="password"
+                  type={showPassword? "text" : "password"}
                   placeholder="Contraseña"
                   name="password"
                   className="w-full pl-10 pr-3 py-3 text-sm text-gray-700 bg-white border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#00b4d8]"
                 />
+                <div className="flex justify-center items-center text-gray-700 hover:cursor-pointer"  onClick={()=> setShowPassword(!showPassword)}>
+                    {
+                      showPassword ? (
+                        <IoMdEye className="h-5 w-5"/>
+                      ):(
+                        <IoMdEyeOff className="h-5 w-5"/>
+                      )
+                    }
+                  </div>
               </div>
 
               {/* Checkbox Recordar */}

@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ValidationPipe, ParseIntPipe, NotFoundException, Injectable } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ValidationPipe, ParseIntPipe, NotFoundException, Injectable, UseInterceptors, UploadedFile, UploadedFiles } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { User } from '../auth/userDecorator';
 import { paginationQueryDto, PaginationResponse } from '../clients/dto/pagination.dto';
 import { permittedRoles } from '../auth/authorizationUtils/permittedRoles';
 import { GetProductDto } from './dto/get-product.dto';
-import { Transform } from 'class-transformer';
-import { getUnifiedParams } from './dto/create-inventory.dto';
+import { CreateInventoryDto, getUnifiedParams } from './dto/create-inventory.dto';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 @Controller('inventory')
 @Injectable()
 export class InventoryController {
@@ -16,6 +16,11 @@ export class InventoryController {
     return await this.inventoryService.findAll(user.companyId);
   }
 
+  @Post()
+  @UseInterceptors(AnyFilesInterceptor())
+  async create(@UploadedFiles() photos : Express.Multer.File[] , @Body(new ValidationPipe({transform: true})) createInventoryDto : CreateInventoryDto, @User() user : User ){
+    return await this.inventoryService.create(createInventoryDto, user.warehouseId, user.companyId , photos )
+  }
   @Get('unifiedSearch')
   async unifiedSearch(
     @User() user: User,

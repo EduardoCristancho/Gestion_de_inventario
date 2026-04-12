@@ -3,8 +3,11 @@ import { NextRequest } from 'next/server'
  
 // This function can be marked `async` if using `await` inside
 export async  function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  
   const token = request.cookies.get('token');
-  if (!token) {
+  
+  if (!token ) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
   try{
@@ -24,6 +27,7 @@ export async  function middleware(request: NextRequest) {
     }
     
     const user = await response.json();
+    
     if (!user) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
@@ -38,6 +42,6 @@ export async  function middleware(request: NextRequest) {
  
 export const config = {
   matcher: [
-      "/((?!login|api/auth|_next/static|_next/image|favicon.ico).*)",
-    ],
+      "/((?!login|signup|api/auth|_next/static|_next/image|favicon.ico|public|.*\\.(?:jpg|jpeg|gif|png|webp|svg)).*)",
+    ]
 }

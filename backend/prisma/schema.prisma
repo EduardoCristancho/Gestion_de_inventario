@@ -11,6 +11,7 @@ datasource db {
 model Company {
   company_id   Int         @id @default(autoincrement())
   visibility   Boolean     @default(true)
+  rif          String?    
   company_logo String?
   name         String
   tax_id       String?     @unique
@@ -46,6 +47,7 @@ model Customer {
   phone       String?
   visibility  Boolean @default(true)
   id_card     String
+  is_default  Boolean @default(false)
   Company     Company @relation(fields: [company_id], references: [company_id], onDelete: Cascade)
   Sale        Sale[]
 }
@@ -164,7 +166,7 @@ model Stock {
   stock_movement_id Int
   quantity          Int
   created_at        DateTime      @default(now())
-  updated_at        DateTime
+  updated_at        DateTime      @default(now()) @updatedAt
   model_product_id  Int
   ModelProduct      ModelProduct  @relation(fields: [model_product_id], references: [model_product_id], onDelete: Cascade)
   StockMovement     StockMovement @relation(fields: [stock_movement_id], references: [stock_movement_id], onDelete: SetNull)
@@ -182,11 +184,12 @@ model Supplier {
   supplier_id  Int            @id @default(autoincrement())
   company_id   Int
   name         String
-  RIF          String
+  RIF          String?
   email        String?
   address      String?
   phone        String?
   visibility   Boolean        @default(true)
+  is_default   Boolean @default(false)
   ModelProduct ModelProduct[]
   Company      Company        @relation(fields: [company_id], references: [company_id], onDelete: Cascade)
 }
@@ -215,6 +218,7 @@ model Warehouse {
   address      String?
   phone        String?
   visibility   Boolean       @default(true)
+  is_default   Boolean @default(false)
   ProductList  ProductList[]
   Stock        Stock[]
   User         User[]

@@ -60,7 +60,7 @@ function SearchInput({
         //asignamos la data al state
         setFilteredProducts(products.data.map((product: any)=>{ return {
             sku: product.sku,
-            image: '/noimage',
+            image: product.img,
             productId: product.model_product_id,
             description: product.description,
             name: product.name,
